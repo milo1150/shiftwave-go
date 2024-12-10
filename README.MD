@@ -15,14 +15,16 @@ kill -9 <PID>
 ### CLI check db
 
 ``` bash
-pgcli postgres://postgres:postgres@127.0.0.1:5432/mydb
-pgcli postgres://postgres:postgres@0.0.0.0:5432/mydb
+ pgcli postgres://postgres:postgres@127.0.0.1:5432/mydb
+ pgcli postgres://postgres:postgres@0.0.0.0:5432/mydb
 ```
+
+## Docker
 
 ### Docker Stop and Remove Everything Related to Docker Compose
 
 ```bash
-docker-compose down -v
+ docker-compose down -v
 ```
 
 down: Stops and removes containers and networks defined in the docker-compose.yml.
@@ -31,8 +33,34 @@ down: Stops and removes containers and networks defined in the docker-compose.ym
 #### Remove All Images Built by Docker Compose: To remove images built by Docker Compose, include the --rmi flag
 
 ```bash
-docker-compose down --rmi all -v
+ docker-compose down --rmi all -v
 ```
 
 --rmi all: Removes all images built by docker-compose.
 -v: Also removes volumes associated with the containers.
+
+## Deploying for Production
+
+### Build the Production Images
+
+```bash
+ docker-compose -f docker-compose.production.yml build
+```
+
+### Run in Detached Mode
+
+```bash
+ docker-compose -f docker-compose.production.yml build
+```
+
+### Check Logs
+
+```bash
+ docker-compose -f docker-compose.production.yml build
+```
+
+### Test run in local pc
+
+```bash
+ docker-compose -f docker-compose.production.yml up --build
+```

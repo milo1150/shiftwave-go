@@ -21,7 +21,8 @@ services:
   app:
     build:
       context: .
-    container_name: go-app
+      dockerfile: Dockerfile.production
+    container_name: go-app-prd
     depends_on:
       postgres:
         condition: service_healthy
@@ -29,9 +30,6 @@ services:
       - '8080:8080'
     env_file:
       - .env
-    volumes:
-      - .:/app
-      - /app/tmp
     working_dir: /app
 
 volumes:
