@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   postgres:
     image: postgres:15
@@ -28,6 +29,16 @@ services:
       - '8080:8080'
     env_file:
       - .env
+    volumes:
+      - .:/app
+      - /app/tmp
+    working_dir: /app
+
+    # command: ['./main']
+  # Optional: set environment variables
+  # environment:
+  #   - AIR_GO_BIN=go
+  #   - GIN_MODE=debug
 
 volumes:
   postgres-data:

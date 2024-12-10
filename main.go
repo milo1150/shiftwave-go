@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 
+	"github.com/labstack/echo"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func main() {
+func connectDB() {
 	// Define the correct PostgreSQL connection string
 	dsn := "host=postgres user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=UTC"
 
@@ -31,4 +33,17 @@ func main() {
 
 	fmt.Println("Connected to PostgreSQL using GORM!")
 	fmt.Println("RUN OK")
+}
+
+func startServer() {
+	e := echo.New()
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World")
+	})
+	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func main() {
+	connectDB()
+	startServer()
 }

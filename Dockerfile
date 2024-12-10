@@ -1,21 +1,49 @@
+# Use official Go image
 FROM golang:1.23 as builder
 
+# Set the working directory
 WORKDIR /app
 
+# Install Air for live reloading
+RUN go install github.com/air-verse/air@latest
+
+# Copy Go modules and dependencies
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod download && go mod verify
 
-COPY . ./
+# Copy the rest of the application code
+COPY . .
 
-RUN go build -o myapp .
+# Expose the application port
+EXPOSE 8080
 
-FROM ubuntu:22.04
-
-WORKDIR /root/
-
-COPY --from=builder /app/myapp .
-
-CMD ["./myapp"]
+# For running in dev mode:
+CMD ["air", "-c", ".air.toml"]
 
 
+# # Build stage
+# FROM golang:1.23 as builder
 
+# WORKDIR /app
+# COPY go.mod go.sum ./
+# RUN go mod download && go mod verify
+# COPY . .
+
+# # Build the binary
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
+
+# # Runtime stage
+# FROM debian:bullseye-slim
+# WORKDIR /app
+
+# # Copy the binary from the builder stage
+# COPY --from=builder /app/main .
+
+# # Ensure the binary is executable
+# RUN chmod +x ./main
+
+# # Expose port if necessary
+# EXPOSE 8080
+
+# # Run the binary
+# CMD ["./main"]
