@@ -1,4 +1,4 @@
-module try-gorm-v1
+module shiftwave-go
 
 go 1.23.3
 
