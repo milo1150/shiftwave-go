@@ -11,7 +11,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data-prd:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
@@ -20,8 +20,8 @@ services:
 
   app:
     build:
-      context: .
-      dockerfile: Dockerfile.production
+      context: ..
+      dockerfile: deployments/Dockerfile.production
     container_name: go-app-prd
     depends_on:
       postgres:
@@ -29,8 +29,8 @@ services:
     ports:
       - '8080:8080'
     env_file:
-      - .env
+      - .env.production
     working_dir: /app
 
 volumes:
-  postgres-data:
+  postgres-data-prd:

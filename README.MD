@@ -1,4 +1,4 @@
-# NOTE
+# WELCOME TO THE CLUB
 
 ## DB
 
@@ -19,7 +19,7 @@ kill -9 <PID>
  pgcli postgres://postgres:postgres@0.0.0.0:5432/mydb
 ```
 
-## Docker
+## Docker and Run
 
 ### Docker Stop and Remove Everything Related to Docker Compose
 
@@ -27,10 +27,11 @@ kill -9 <PID>
  docker-compose down -v
 ```
 
-down: Stops and removes containers and networks defined in the docker-compose.yml.
--v: Removes any associated volumes.
+#### down: Stops and removes containers and networks defined in the docker-compose.yml
 
-#### Remove All Images Built by Docker Compose: To remove images built by Docker Compose, include the --rmi flag
+#### -v: Removes any associated volumes
+
+### Remove All Images Built by Docker Compose: To remove images built by Docker Compose, include the --rmi flag
 
 ```bash
  docker-compose down --rmi all -v
@@ -41,28 +42,16 @@ down: Stops and removes containers and networks defined in the docker-compose.ym
 
 ## Deploying for Production
 
+### Run local development
+
+```bash
+ docker-compose up --build
+```
+
 ### Build the Production Images
 
 ```bash
- docker-compose -f docker-compose.production.yml build
-```
-
-### Run in Detached Mode
-
-```bash
- docker-compose -f docker-compose.production.yml build
-```
-
-### Check Logs
-
-```bash
- docker-compose -f docker-compose.production.yml build
-```
-
-### Test run in local pc
-
-```bash
- docker-compose -f docker-compose.production.yml up --build
+ docker-compose -f deployments/docker-compose.production.yml up --build
 ```
 
 ## Folder Structure
