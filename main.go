@@ -25,10 +25,6 @@ func main() {
 
 	// Routes
 	handlers.SetupRoutes(e, app)
-	// e.GET("/", func(c echo.Context) error {
-	// 	return c.String(http.StatusOK, "Hello, World")
-	// })
-	// e.POST("/assessment", app.createProduct)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

@@ -9,7 +9,7 @@ RUN go install github.com/air-verse/air@latest
 
 # Copy Go modules and dependencies
 COPY go.mod go.sum ./
-RUN go mod download && go mod verify
+RUN go mod download && go mod tidy && go mod verify
 
 # Copy the rest of the application code
 COPY . .

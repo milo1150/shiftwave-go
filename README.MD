@@ -99,6 +99,8 @@ your-service/
 │   │   ├── connection.go
 │   │   └── migrations/
 │   │       └── 001_create_assessments_table.up.sql
+│   ├── utils/
+│   │   └── validation.go
 │   └── configs/
 │       └── config.yaml
 ├── pkg/

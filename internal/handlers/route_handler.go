@@ -8,6 +8,6 @@ import (
 
 func SetupRoutes(e *echo.Echo, app *types.App) {
 	e.POST("/assessment", func(ctx echo.Context) error {
-		return CreateAssessment(ctx, app)
+		return CreateAssessmentHandler(ctx, app)
 	})
 }
