@@ -15,8 +15,13 @@ kill -9 <PID>
 ### CLI check db
 
 ``` bash
- pgcli postgres://postgres:postgres@127.0.0.1:5432/mydb
  pgcli postgres://postgres:postgres@0.0.0.0:5432/mydb
+```
+
+or
+
+``` bash
+ pgcli postgres://postgres:postgres@127.0.0.1:5432/mydb
 ```
 
 ## Docker and Run
@@ -56,16 +61,25 @@ kill -9 <PID>
 
 ## Folder Structure
 
- Directory Breakdown
- cmd/: Entry point(s) of your application.
- internal/: Contains the core application code, segregated into:
- handlers/: HTTP handlers managing incoming requests.
- services/: Business logic.
- repositories/: Data access layer interacting with GORM.
- models/: Database models representing your data structures.
- database/: Database connection setup and migrations.
- configs/: Configuration management.
- pkg/, api/, configs/, scripts/, tests/, docs/: As previously described.
+### Directory Breakdown
+
+cmd/: Entry point(s) of your application
+
+internal/: Contains the core application code, segregated into
+
+handlers/: HTTP handlers managing incoming requests
+
+services/: Business logic
+
+repositories/: Data access layer interacting with GORM
+
+models/: Database models representing your data structures
+
+database/: Database connection setup and migrations
+
+configs/: Configuration management
+
+pkg/, api/, configs/, scripts/, tests/, docs/: As previously described
 
 ```bash
 your-service/
