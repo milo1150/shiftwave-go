@@ -65,7 +65,7 @@ down: Stops and removes containers and networks defined in the docker-compose.ym
  docker-compose -f docker-compose.production.yml up --build
 ```
 
-### Folder Structure
+## Folder Structure
 
  Directory Breakdown
  cmd/: Entry point(s) of your application.
