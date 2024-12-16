@@ -90,6 +90,8 @@ your-service/
 │   ├── handlers/
 │   │   ├── root_handler.go
 │   │   └── assessment_handler.go
+│   ├── dto/
+│   │   └── assessment_dto.go
 │   ├── services/
 │   │   └── assessment_service.go
 │   ├── repositories/
