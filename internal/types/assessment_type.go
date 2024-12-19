@@ -2,7 +2,7 @@ package types
 
 import "time"
 
-type GetAssessmentsDTO struct {
+type GetAssessmentDTO struct {
 	ID        uint      `json:"id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -18,10 +18,10 @@ type AssessmentQueryParams struct {
 }
 
 type AssessmentsResponse struct {
-	Page       int                 `json:"page" validate:"omitempty,numeric"`
-	PageSize   int                 `json:"page_size" validate:"omitempty,numeric"`
-	TotalItems int64               `json:"total_items"`
-	Items      []GetAssessmentsDTO `json:"items"`
+	Page       int                `json:"page" validate:"omitempty,numeric"`
+	PageSize   int                `json:"page_size" validate:"omitempty,numeric"`
+	TotalItems int64              `json:"total_items"`
+	Items      []GetAssessmentDTO `json:"items"`
 }
 
 type CreateAssessmentPayload struct {

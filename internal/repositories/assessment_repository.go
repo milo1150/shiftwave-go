@@ -55,3 +55,21 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 
 	return result, nil
 }
+
+func GetAssessment(app *types.App, id int) (*types.GetAssessmentDTO, error) {
+	assessment := &models.Assessment{}
+
+	// v1
+	dbQuery := app.DB.Where("id = ?", id).First(assessment)
+
+	// v2
+	// dbQuery := app.DB.First(assessment, "id = ?", id)
+
+	if err := dbQuery.Error; err != nil {
+		return nil, err
+	}
+
+	result := dto.TransformGetAssessment(*assessment)
+
+	return &result, nil
+}

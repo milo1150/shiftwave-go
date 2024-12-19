@@ -6,6 +6,7 @@ import (
 	"shiftwave-go/internal/repositories"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
@@ -55,6 +56,19 @@ func GetAssessmentsHandler(c echo.Context, app *types.App) error {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "Query error")
 	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
+func GetAssessment(c echo.Context, app *types.App) error {
+	param := c.Param("id")
+
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid param")
+	}
+
+	result, _ := repositories.GetAssessment(app, id)
 
 	return c.JSON(http.StatusOK, result)
 }
