@@ -20,7 +20,7 @@ func main() {
 	app := &types.App{DB: db}
 
 	// Middlewares
-	middleware.SetupMiddleware(e)
+	middleware.SetupMiddlewares(e)
 
 	// Routes
 	handlers.SetupRoutes(e, app)
