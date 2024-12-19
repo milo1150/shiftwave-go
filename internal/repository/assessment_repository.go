@@ -25,27 +25,34 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 
 	dbQuery := app.DB
 
+	// Count
+	var totalItems int64
+	dbQuery.Model(&model.Assessment{}).Count(&totalItems)
+
+	// Handle Remark param
 	if q.Remark != nil {
 		dbQuery = dbQuery.Where("remark LIKE ?", "%"+*q.Remark+"%")
 	}
 
+	// Handle Score param
 	if q.Score != nil {
 		dbQuery = dbQuery.Where("score = ?", *q.Score)
 	}
 
-	// Add pagination
+	// Calculate pagination
 	offset := (page - 1) * pageSize
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
-	var totalItems int64
-	dbQuery.Model(&model.Assessment{}).Count(&totalItems)
+	// Order then Find all
+	dbQuery.Order("id DESC").Find(assessment)
 
-	if err := dbQuery.Find(assessment).Error; err != nil {
+	// Execute
+	if err := dbQuery.Error; err != nil {
 		return nil, err
 	}
 
+	// Transform result
 	assessments := dto.TransformGetAssessments(*assessment)
-
 	result := &types.AssessmentsResponse{
 		Page:       page,
 		PageSize:   pageSize,
@@ -59,11 +66,7 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 func GetAssessment(app *types.App, id int) (*types.GetAssessmentDTO, error) {
 	assessment := &model.Assessment{}
 
-	// v1
 	dbQuery := app.DB.Where("id = ?", id).First(assessment)
-
-	// v2
-	// dbQuery := app.DB.First(assessment, "id = ?", id)
 
 	if err := dbQuery.Error; err != nil {
 		return nil, err

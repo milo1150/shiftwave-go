@@ -22,7 +22,7 @@ func rateLimiter() echo.MiddlewareFunc {
 	config := middleware.RateLimiterConfig{
 		Skipper: middleware.DefaultSkipper,
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
-			middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(1), Burst: 1, ExpiresIn: 1 * time.Minute},
+			middleware.RateLimiterMemoryStoreConfig{Rate: rate.Limit(1), Burst: 4, ExpiresIn: 1 * time.Minute},
 		),
 		IdentifierExtractor: func(ctx echo.Context) (string, error) {
 			id := ctx.RealIP()

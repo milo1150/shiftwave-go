@@ -60,7 +60,7 @@ func GetAssessmentsHandler(c echo.Context, app *types.App) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func GetAssessment(c echo.Context, app *types.App) error {
+func GetAssessmentHandler(c echo.Context, app *types.App) error {
 	param := c.Param("id")
 
 	id, err := strconv.Atoi(param)

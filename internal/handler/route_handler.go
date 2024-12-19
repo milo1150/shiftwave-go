@@ -14,6 +14,6 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 		return GetAssessmentsHandler(ctx, app)
 	})
 	e.GET("/assessment/:id", func(ctx echo.Context) error {
-		return GetAssessment(ctx, app)
+		return GetAssessmentHandler(ctx, app)
 	})
 }
