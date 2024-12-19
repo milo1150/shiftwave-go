@@ -1,12 +1,12 @@
 package main
 
 import (
+	middleware "shiftwave-go/internal"
 	"shiftwave-go/internal/database"
 	"shiftwave-go/internal/handlers"
 	"shiftwave-go/internal/types"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -19,9 +19,8 @@ func main() {
 	// Initialize state
 	app := &types.App{DB: db}
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	// Middlewares
+	middleware.SetupMiddleware(e)
 
 	// Routes
 	handlers.SetupRoutes(e, app)

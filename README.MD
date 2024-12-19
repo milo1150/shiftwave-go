@@ -107,7 +107,8 @@ your-service/
 │   ├── utils/
 │   │   └── validation.go
 │   └── configs/
-│       └── config.yaml
+│   │   └── config.yaml
+│   └── middleware.go
 ├── pkg/
 │   └── (shared libraries)
 ├── api/
