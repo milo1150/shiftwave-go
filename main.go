@@ -3,7 +3,7 @@ package main
 import (
 	middleware "shiftwave-go/internal"
 	"shiftwave-go/internal/database"
-	"shiftwave-go/internal/handlers"
+	"shiftwave-go/internal/handler"
 	"shiftwave-go/internal/types"
 
 	"github.com/labstack/echo/v4"
@@ -23,7 +23,7 @@ func main() {
 	middleware.SetupMiddlewares(e)
 
 	// Routes
-	handlers.SetupRoutes(e, app)
+	handler.SetupRoutes(e, app)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

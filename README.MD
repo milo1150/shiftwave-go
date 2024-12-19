@@ -87,16 +87,16 @@ your-service/
 │   └── yourservice/
 │       └── main.go
 ├── internal/
-│   ├── handlers/
+│   ├── handler/
 │   │   ├── root_handler.go
 │   │   └── assessment_handler.go
 │   ├── dto/
 │   │   └── assessment_dto.go
 │   ├── services/
 │   │   └── assessment_service.go
-│   ├── repositories/
+│   ├── repository/
 │   │   └── assessment_repository.go
-│   ├── models/
+│   ├── model/
 │   │   └── assessment_model.go
 │   ├── types/
 │   │   └── assessment_type.go

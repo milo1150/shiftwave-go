@@ -1,9 +1,9 @@
-package handlers
+package handler
 
 import (
 	"fmt"
 	"net/http"
-	"shiftwave-go/internal/repositories"
+	"shiftwave-go/internal/repository"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	"strconv"
@@ -25,7 +25,7 @@ func CreateAssessmentHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, errorMessagees)
 	}
 
-	if result := repositories.CreateAssessment(app, payload); result != nil {
+	if result := repository.CreateAssessment(app, payload); result != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error()})
 	}
 
@@ -52,7 +52,7 @@ func GetAssessmentsHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
 
-	result, err := repositories.GetAssessments(app, q)
+	result, err := repository.GetAssessments(app, q)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "Query error")
 	}
@@ -68,7 +68,7 @@ func GetAssessment(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, "Invalid param")
 	}
 
-	result, _ := repositories.GetAssessment(app, id)
+	result, _ := repository.GetAssessment(app, id)
 
 	return c.JSON(http.StatusOK, result)
 }

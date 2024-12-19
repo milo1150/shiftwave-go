@@ -1,17 +1,17 @@
-package repositories
+package repository
 
 import (
 	"shiftwave-go/internal/dto"
-	"shiftwave-go/internal/models"
+	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 )
 
 func CreateAssessment(app *types.App, payload *types.CreateAssessmentPayload) error {
-	return app.DB.Create(&models.Assessment{Remark: payload.Remark, Score: payload.Score}).Error
+	return app.DB.Create(&model.Assessment{Remark: payload.Remark, Score: payload.Score}).Error
 }
 
 func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.AssessmentsResponse, error) {
-	assessment := &[]models.Assessment{}
+	assessment := &[]model.Assessment{}
 
 	page := 1
 	if q.Page != nil {
@@ -38,7 +38,7 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
 	var totalItems int64
-	dbQuery.Model(&models.Assessment{}).Count(&totalItems)
+	dbQuery.Model(&model.Assessment{}).Count(&totalItems)
 
 	if err := dbQuery.Find(assessment).Error; err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 }
 
 func GetAssessment(app *types.App, id int) (*types.GetAssessmentDTO, error) {
-	assessment := &models.Assessment{}
+	assessment := &model.Assessment{}
 
 	// v1
 	dbQuery := app.DB.Where("id = ?", id).First(assessment)

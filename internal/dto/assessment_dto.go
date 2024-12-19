@@ -1,11 +1,11 @@
 package dto
 
 import (
-	"shiftwave-go/internal/models"
+	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 )
 
-func TransformGetAssessments(assessments []models.Assessment) []types.GetAssessmentDTO {
+func TransformGetAssessments(assessments []model.Assessment) []types.GetAssessmentDTO {
 	transformed := []types.GetAssessmentDTO{}
 	for _, v := range assessments {
 		transformed = append(transformed, TransformGetAssessment(v))
@@ -13,7 +13,7 @@ func TransformGetAssessments(assessments []models.Assessment) []types.GetAssessm
 	return transformed
 }
 
-func TransformGetAssessment(model models.Assessment) types.GetAssessmentDTO {
+func TransformGetAssessment(model model.Assessment) types.GetAssessmentDTO {
 	transformed := types.GetAssessmentDTO{
 		ID:        model.ID,
 		CreatedAt: model.CreatedAt,

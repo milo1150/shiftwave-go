@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
-	"shiftwave-go/internal/models"
+	"shiftwave-go/internal/model"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -42,6 +42,6 @@ func InitDatabase() *gorm.DB {
 
 func getModels() []interface{} {
 	return []interface{}{
-		&models.Assessment{},
+		&model.Assessment{},
 	}
 }
