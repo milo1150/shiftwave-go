@@ -3,7 +3,7 @@ package handlers
 import (
 	"shiftwave-go/internal/types"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func SetupRoutes(e *echo.Echo, app *types.App) {
