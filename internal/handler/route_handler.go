@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 
 	"github.com/labstack/echo/v4"
@@ -14,6 +15,9 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 		return GetAssessmentsHandler(ctx, app)
 	})
 	e.GET("/assessment/:id", func(ctx echo.Context) error {
+		if err := middleware.JWT(e, ctx); err != nil {
+			return err
+		}
 		return GetAssessmentHandler(ctx, app)
 	})
 }

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"crypto/subtle"
 	"net/http"
 	"time"
 
@@ -10,15 +9,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func SetupMiddlewares(e *echo.Echo) {
-	e.Use(middleware.Secure())
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
-	e.Use(rateLimiter())
-	// e.Use(basicAuth())
-}
-
-func rateLimiter() echo.MiddlewareFunc {
+func RateLimiter() echo.MiddlewareFunc {
 	config := middleware.RateLimiterConfig{
 		Skipper: middleware.DefaultSkipper,
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
@@ -37,15 +28,4 @@ func rateLimiter() echo.MiddlewareFunc {
 	}
 
 	return middleware.RateLimiterWithConfig(config)
-}
-
-func BasicAuth() echo.MiddlewareFunc {
-	return middleware.BasicAuth(func(username, password string, ctx echo.Context) (bool, error) {
-		// Be careful to use constant time comparison to prevent timing attacks
-		if subtle.ConstantTimeCompare([]byte(username), []byte("joe")) == 1 &&
-			subtle.ConstantTimeCompare([]byte(password), []byte("pwd")) == 1 {
-			return true, nil
-		}
-		return false, nil
-	})
 }

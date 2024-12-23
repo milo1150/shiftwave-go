@@ -1,9 +1,9 @@
 package main
 
 import (
-	middleware "shiftwave-go/internal"
 	"shiftwave-go/internal/database"
 	"shiftwave-go/internal/handler"
+	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 
 	"github.com/labstack/echo/v4"
