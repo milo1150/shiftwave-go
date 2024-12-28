@@ -12,8 +12,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func CreateAssessmentHandler(c echo.Context, app *types.App) error {
-	payload := new(types.CreateAssessmentPayload)
+func CreateRatingHandler(c echo.Context, app *types.App) error {
+	payload := new(types.CreateRatingPayload)
 	if err := c.Bind(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
 	}
@@ -25,15 +25,15 @@ func CreateAssessmentHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, errorMessagees)
 	}
 
-	if result := repository.CreateAssessment(app, payload); result != nil {
+	if result := repository.CreateRating(app, payload); result != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error()})
 	}
 
 	return c.JSON(http.StatusOK, "OK")
 }
 
-func GetAssessmentsHandler(c echo.Context, app *types.App) error {
-	q := &types.AssessmentQueryParams{}
+func GetRatingsHandler(c echo.Context, app *types.App) error {
+	q := &types.RatingQueryParams{}
 	if err := c.Bind(q); err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid Query")
 	}
@@ -52,7 +52,7 @@ func GetAssessmentsHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
 
-	result, err := repository.GetAssessments(app, q)
+	result, err := repository.GetRatings(app, q)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, "Query error")
 	}
@@ -60,7 +60,7 @@ func GetAssessmentsHandler(c echo.Context, app *types.App) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func GetAssessmentHandler(c echo.Context, app *types.App) error {
+func GetRatingHandler(c echo.Context, app *types.App) error {
 	param := c.Param("id")
 
 	id, err := strconv.Atoi(param)
@@ -68,7 +68,7 @@ func GetAssessmentHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, "Invalid param")
 	}
 
-	result, _ := repository.GetAssessment(app, id)
+	result, _ := repository.GetRating(app, id)
 
 	return c.JSON(http.StatusOK, result)
 }

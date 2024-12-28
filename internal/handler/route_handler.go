@@ -8,16 +8,16 @@ import (
 )
 
 func SetupRoutes(e *echo.Echo, app *types.App) {
-	e.POST("/assessment", func(ctx echo.Context) error {
-		return CreateAssessmentHandler(ctx, app)
+	e.POST("/rating", func(ctx echo.Context) error {
+		return CreateRatingHandler(ctx, app)
 	})
-	e.GET("/assessments", func(ctx echo.Context) error {
-		return GetAssessmentsHandler(ctx, app)
+	e.GET("/ratings", func(ctx echo.Context) error {
+		return GetRatingsHandler(ctx, app)
 	})
-	e.GET("/assessment/:id", func(ctx echo.Context) error {
+	e.GET("/rating/:id", func(ctx echo.Context) error {
 		if err := middleware.JWT(e, ctx); err != nil {
 			return err
 		}
-		return GetAssessmentHandler(ctx, app)
+		return GetRatingHandler(ctx, app)
 	})
 }

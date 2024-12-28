@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Function to pretty-print the slice of assessments
+// Function to pretty-print the slice
 func PrettyPrint(data interface{}, msg string) {
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {

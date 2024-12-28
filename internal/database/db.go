@@ -42,6 +42,6 @@ func InitDatabase() *gorm.DB {
 
 func getModels() []interface{} {
 	return []interface{}{
-		&model.Assessment{},
+		&model.Rating{},
 	}
 }

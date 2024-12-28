@@ -6,12 +6,12 @@ import (
 	"shiftwave-go/internal/types"
 )
 
-func CreateAssessment(app *types.App, payload *types.CreateAssessmentPayload) error {
-	return app.DB.Create(&model.Assessment{Remark: payload.Remark, Score: payload.Score}).Error
+func CreateRating(app *types.App, payload *types.CreateRatingPayload) error {
+	return app.DB.Create(&model.Rating{Remark: payload.Remark, Score: payload.Score}).Error
 }
 
-func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.AssessmentsResponse, error) {
-	assessment := &[]model.Assessment{}
+func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsResponse, error) {
+	rating := &[]model.Rating{}
 
 	page := 1
 	if q.Page != nil {
@@ -27,7 +27,7 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 
 	// Count
 	var totalItems int64
-	dbQuery.Model(&model.Assessment{}).Count(&totalItems)
+	dbQuery.Model(&model.Rating{}).Count(&totalItems)
 
 	// Handle Remark param
 	if q.Remark != nil {
@@ -44,7 +44,7 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
 	// Order then Find all
-	dbQuery.Order("id DESC").Find(assessment)
+	dbQuery.Order("id DESC").Find(rating)
 
 	// Execute
 	if err := dbQuery.Error; err != nil {
@@ -52,27 +52,27 @@ func GetAssessments(app *types.App, q *types.AssessmentQueryParams) (*types.Asse
 	}
 
 	// Transform result
-	assessments := dto.TransformGetAssessments(*assessment)
-	result := &types.AssessmentsResponse{
+	ratings := dto.TransformGetRatings(*rating)
+	result := &types.RatingsResponse{
 		Page:       page,
 		PageSize:   pageSize,
-		Items:      assessments,
+		Items:      ratings,
 		TotalItems: totalItems,
 	}
 
 	return result, nil
 }
 
-func GetAssessment(app *types.App, id int) (*types.GetAssessmentDTO, error) {
-	assessment := &model.Assessment{}
+func GetRating(app *types.App, id int) (*types.GetRatingDTO, error) {
+	rating := &model.Rating{}
 
-	dbQuery := app.DB.Where("id = ?", id).First(assessment)
+	dbQuery := app.DB.Where("id = ?", id).First(rating)
 
 	if err := dbQuery.Error; err != nil {
 		return nil, err
 	}
 
-	result := dto.TransformGetAssessment(*assessment)
+	result := dto.TransformGetRating(*rating)
 
 	return &result, nil
 }

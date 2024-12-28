@@ -89,21 +89,21 @@ your-service/
 ├── internal/
 │   ├── handler/
 │   │   ├── root_handler.go
-│   │   └── assessment_handler.go
+│   │   └── rating_handler.go
 │   ├── dto/
-│   │   └── assessment_dto.go
+│   │   └── rating_dto.go
 │   ├── services/
-│   │   └── assessment_service.go
+│   │   └── rating_service.go
 │   ├── repository/
-│   │   └── assessment_repository.go
+│   │   └── rating_repository.go
 │   ├── model/
-│   │   └── assessment_model.go
+│   │   └── rating_model.go
 │   ├── types/
-│   │   └── assessment_type.go
+│   │   └── rating_type.go
 │   ├── database/
 │   │   ├── connection.go
 │   │   └── migrations/
-│   │       └── 001_create_assessments_table.up.sql
+│   │       └── 001_create_ratings_table.up.sql
 │   ├── utils/
 │   │   └── validation.go
 │   └── configs/
