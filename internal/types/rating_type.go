@@ -27,4 +27,5 @@ type RatingsResponse struct {
 type CreateRatingPayload struct {
 	Remark string `json:"remark" validate:"required"`
 	Score  uint   `json:"score" validate:"required,min=1,max=10"`
+	Branch uint   `json:"branch" validate:"required,numeric"`
 }

@@ -9,7 +9,7 @@ import (
 	"golang.org/x/time/rate"
 )
 
-func RateLimiter() echo.MiddlewareFunc {
+func ConfigRateLimiter() echo.MiddlewareFunc {
 	config := middleware.RateLimiterConfig{
 		Skipper: middleware.DefaultSkipper,
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(

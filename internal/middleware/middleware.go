@@ -9,6 +9,6 @@ func SetupMiddlewares(e *echo.Echo) {
 	e.Use(middleware.Secure())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(SetupCORS())
-	e.Use(RateLimiter())
+	e.Use(ConfigCORS())
+	e.Use(ConfigRateLimiter())
 }

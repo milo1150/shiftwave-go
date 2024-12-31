@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"shiftwave-go/internal/repository"
 	"shiftwave-go/internal/types"
@@ -36,13 +35,6 @@ func GetRatingsHandler(c echo.Context, app *types.App) error {
 	q := &types.RatingQueryParams{}
 	if err := c.Bind(q); err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid Query")
-	}
-
-	if q.Page != nil && *q.Page > 0 {
-		fmt.Println("queryparams -> page = ", *q.Page)
-	}
-	if q.PageSize != nil && *q.PageSize > 0 {
-		fmt.Println("queryparams -> page_size = ", *q.PageSize)
 	}
 
 	v := validator.New()

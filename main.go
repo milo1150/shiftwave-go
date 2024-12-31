@@ -19,6 +19,9 @@ func main() {
 	// Initialize state
 	app := &types.App{DB: db}
 
+	// Load json data and mapping to database
+	database.MasterDataLoader(app.DB)
+
 	// Middlewares
 	middleware.SetupMiddlewares(e)
 

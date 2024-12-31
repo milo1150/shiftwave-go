@@ -96,6 +96,8 @@ your-service/
 │   │   └── rating_service.go
 │   ├── repository/
 │   │   └── rating_repository.go
+│   ├── resources/
+│   │   └── master_data.json
 │   ├── model/
 │   │   └── rating_model.go
 │   ├── types/
