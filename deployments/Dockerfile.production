@@ -3,6 +3,7 @@
 # Build stage
 FROM golang:1.23 as builder
 
+# Set the working directory
 WORKDIR /app
 
 # Install Staticcheck
@@ -27,6 +28,9 @@ WORKDIR /app
 
 # Copy the binary from the builder stage
 COPY --from=builder /app/main .
+
+# Copy the master_data.json file to the runtime image
+COPY internal/resources/master_data.json ./internal/resources/
 
 # Ensure the binary is executable
 RUN chmod +x ./main
