@@ -7,7 +7,7 @@ import (
 )
 
 func CreateRating(app *types.App, payload *types.CreateRatingPayload) error {
-	return app.DB.Create(&model.Rating{Remark: payload.Remark, Score: payload.Score}).Error
+	return app.DB.Create(&model.Rating{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
 }
 
 func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsResponse, error) {
@@ -43,8 +43,8 @@ func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsRespo
 	offset := (page - 1) * pageSize
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
-	// Order then Find all
-	dbQuery.Order("id DESC").Find(rating)
+	// Preload Branch and execute query
+	dbQuery.Preload("Branch").Order("id DESC").Find(rating)
 
 	// Execute
 	if err := dbQuery.Error; err != nil {
