@@ -28,7 +28,7 @@ func CreateRatingHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error()})
 	}
 
-	return c.JSON(http.StatusOK, "OK")
+	return c.JSON(http.StatusOK, http.StatusOK)
 }
 
 func GetRatingsHandler(c echo.Context, app *types.App) error {
