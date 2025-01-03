@@ -24,4 +24,8 @@ func SetupRoutes(e *echo.Echo, app *types.App, rdb *redis.Client, ctx context.Co
 		// }
 		return GetReviewHandler(ctx, app)
 	})
+
+	e.GET("/generate-pdf", func(ctx echo.Context) error {
+		return GenerateQRCodeHandler(ctx)
+	})
 }

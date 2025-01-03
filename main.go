@@ -29,7 +29,7 @@ func main() {
 	database.MasterDataLoader(app.DB)
 
 	// Middlewares
-	middleware.SetupMiddlewares(e, rdb, ctx)
+	middleware.SetupMiddlewares(e, ctx)
 
 	// Routes
 	handler.SetupRoutes(e, app, rdb, ctx)

@@ -5,10 +5,9 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/redis/go-redis/v9"
 )
 
-func SetupMiddlewares(e *echo.Echo, rdb *redis.Client, ctx context.Context) {
+func SetupMiddlewares(e *echo.Echo, ctx context.Context) {
 	e.Use(middleware.Secure())
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
