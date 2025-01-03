@@ -89,23 +89,21 @@ your-service/
 ├── internal/
 │   ├── handler/
 │   │   ├── root_handler.go
-│   │   └── rating_handler.go
+│   │   └── review_handler.go
 │   ├── dto/
-│   │   └── rating_dto.go
+│   │   └── review_dto.go
 │   ├── services/
-│   │   └── rating_service.go
+│   │   └── review_service.go
 │   ├── repository/
-│   │   └── rating_repository.go
+│   │   └── review_repository.go
 │   ├── resources/
 │   │   └── master_data.json
 │   ├── model/
-│   │   └── rating_model.go
+│   │   └── review_model.go
 │   ├── types/
-│   │   └── rating_type.go
+│   │   └── review_type.go
 │   ├── database/
 │   │   ├── connection.go
-│   │   └── migrations/
-│   │       └── 001_create_ratings_table.up.sql
 │   ├── utils/
 │   │   └── validation.go
 │   └── configs/

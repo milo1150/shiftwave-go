@@ -6,12 +6,12 @@ import (
 	"shiftwave-go/internal/types"
 )
 
-func CreateRating(app *types.App, payload *types.CreateRatingPayload) error {
-	return app.DB.Create(&model.Rating{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
+func CreateReview(app *types.App, payload *types.CreateReviewPayload) error {
+	return app.DB.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
 }
 
-func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsResponse, error) {
-	rating := &[]model.Rating{}
+func GetReviews(app *types.App, q *types.ReviewQueryParams) (*types.ReviewsResponse, error) {
+	review := &[]model.Review{}
 
 	page := 1
 	if q.Page != nil {
@@ -27,7 +27,7 @@ func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsRespo
 
 	// Count
 	var totalItems int64
-	dbQuery.Model(&model.Rating{}).Count(&totalItems)
+	dbQuery.Model(&model.Review{}).Count(&totalItems)
 
 	// Handle Remark param
 	if q.Remark != nil {
@@ -44,7 +44,7 @@ func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsRespo
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
 	// Preload Branch and execute query
-	dbQuery.Preload("Branch").Order("id DESC").Find(rating)
+	dbQuery.Preload("Branch").Order("id DESC").Find(review)
 
 	// Execute
 	if err := dbQuery.Error; err != nil {
@@ -52,27 +52,27 @@ func GetRatings(app *types.App, q *types.RatingQueryParams) (*types.RatingsRespo
 	}
 
 	// Transform result
-	ratings := dto.TransformGetRatings(*rating)
-	result := &types.RatingsResponse{
+	reviews := dto.TransformGetReviews(*review)
+	result := &types.ReviewsResponse{
 		Page:       page,
 		PageSize:   pageSize,
-		Items:      ratings,
+		Items:      reviews,
 		TotalItems: totalItems,
 	}
 
 	return result, nil
 }
 
-func GetRating(app *types.App, id int) (*types.GetRatingDTO, error) {
-	rating := &model.Rating{}
+func GetReview(app *types.App, id int) (*types.GetReviewDTO, error) {
+	review := &model.Review{}
 
-	dbQuery := app.DB.Where("id = ?", id).First(rating)
+	dbQuery := app.DB.Where("id = ?", id).First(review)
 
 	if err := dbQuery.Error; err != nil {
 		return nil, err
 	}
 
-	result := dto.TransformGetRating(*rating)
+	result := dto.TransformGetReview(*review)
 
 	return &result, nil
 }
