@@ -1,13 +1,11 @@
 package types
 
-import "time"
-
 type GetReviewDTO struct {
-	ID        uint      `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Remark    string    `json:"remark"`
-	Score     uint      `json:"score"`
+	ID        uint   `json:"id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Remark    string `json:"remark"`
+	Score     uint   `json:"score"`
 }
 
 type ReviewQueryParams struct {

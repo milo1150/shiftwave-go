@@ -1,7 +1,20 @@
 package types
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"time"
+
+	"github.com/redis/go-redis/v9"
+	"gorm.io/gorm"
+)
+
+type Env struct {
+	LocalTimezone *time.Location
+}
 
 type App struct {
-	DB *gorm.DB
+	DB      *gorm.DB
+	ENV     Env
+	RDB     *redis.Client
+	Context context.Context
 }

@@ -9,7 +9,7 @@ sudo lsof -i :5432
 ```
 
 ``` bash
-kill -9 <PID>
+sudo kill -9 <PID>
 ```
 
 ### CLI check db

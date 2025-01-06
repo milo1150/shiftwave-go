@@ -4,10 +4,12 @@ import (
 	"shiftwave-go/internal/dto"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
+
+	"gorm.io/gorm"
 )
 
-func CreateReview(app *types.App, payload *types.CreateReviewPayload) error {
-	return app.DB.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
+func CreateReview(db *gorm.DB, payload *types.CreateReviewPayload) error {
+	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
 }
 
 func GetReviews(app *types.App, q *types.ReviewQueryParams) (*types.ReviewsResponse, error) {
@@ -52,7 +54,7 @@ func GetReviews(app *types.App, q *types.ReviewQueryParams) (*types.ReviewsRespo
 	}
 
 	// Transform result
-	reviews := dto.TransformGetReviews(*review)
+	reviews := dto.TransformGetReviews(*review, app.ENV.LocalTimezone)
 	result := &types.ReviewsResponse{
 		Page:       page,
 		PageSize:   pageSize,
@@ -72,7 +74,10 @@ func GetReview(app *types.App, id int) (*types.GetReviewDTO, error) {
 		return nil, err
 	}
 
-	result := dto.TransformGetReview(*review)
+	result, err := dto.TransformGetReview(*review, app.ENV.LocalTimezone)
+	if err != nil {
+		return nil, err
+	}
 
 	return &result, nil
 }

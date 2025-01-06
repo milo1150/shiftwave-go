@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"shiftwave-go/internal/services"
@@ -9,10 +8,10 @@ import (
 	"shiftwave-go/internal/utils"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 )
 
+// TODO: pass App for using ENV value
 func GenerateQRCodeHandler(c echo.Context) error {
 	q := &types.GeneratePdfParams{}
 	if err := c.Bind(q); err != nil {
@@ -24,11 +23,6 @@ func GenerateQRCodeHandler(c echo.Context) error {
 		validationErrors := err.(validator.ValidationErrors)
 		errorMessages := utils.ExtractErrorMessages(validationErrors)
 		return c.JSON(http.StatusBadRequest, errorMessages)
-	}
-
-	_, err := godotenv.Read()
-	if err != nil {
-		log.Fatal("Error loading .env file")
 	}
 
 	m := services.GenerateReviewQRcode(os.Getenv("BASE_URL"), q.BranchId)
