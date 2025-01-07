@@ -1,4 +1,4 @@
-package resources
+package setup
 
 import (
 	"log"

@@ -1,18 +1,19 @@
 package repository
 
 import (
-	"shiftwave-go/internal/dto"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
+	v1dto "shiftwave-go/internal/v1/dto"
+	v1types "shiftwave-go/internal/v1/types"
 
 	"gorm.io/gorm"
 )
 
-func CreateReview(db *gorm.DB, payload *types.CreateReviewPayload) error {
+func CreateReview(db *gorm.DB, payload *v1types.CreateReviewPayload) error {
 	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
 }
 
-func GetReviews(app *types.App, q *types.ReviewQueryParams) (*types.ReviewsResponse, error) {
+func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsResponse, error) {
 	review := &[]model.Review{}
 
 	page := 1
@@ -54,8 +55,8 @@ func GetReviews(app *types.App, q *types.ReviewQueryParams) (*types.ReviewsRespo
 	}
 
 	// Transform result
-	reviews := dto.TransformGetReviews(*review, app.ENV.LocalTimezone)
-	result := &types.ReviewsResponse{
+	reviews := v1dto.TransformGetReviews(*review, app.ENV.LocalTimezone)
+	result := &v1types.ReviewsResponse{
 		Page:       page,
 		PageSize:   pageSize,
 		Items:      reviews,
@@ -65,7 +66,7 @@ func GetReviews(app *types.App, q *types.ReviewQueryParams) (*types.ReviewsRespo
 	return result, nil
 }
 
-func GetReview(app *types.App, id int) (*types.GetReviewDTO, error) {
+func GetReview(app *types.App, id int) (*v1types.GetReviewDTO, error) {
 	review := &model.Review{}
 
 	dbQuery := app.DB.Where("id = ?", id).First(review)
@@ -74,7 +75,7 @@ func GetReview(app *types.App, id int) (*types.GetReviewDTO, error) {
 		return nil, err
 	}
 
-	result, err := dto.TransformGetReview(*review, app.ENV.LocalTimezone)
+	result, err := v1dto.TransformGetReview(*review, app.ENV.LocalTimezone)
 	if err != nil {
 		return nil, err
 	}

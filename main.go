@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"shiftwave-go/internal/database"
-	"shiftwave-go/internal/handler"
+	baseHandler "shiftwave-go/internal/handler"
 	"shiftwave-go/internal/middleware"
-	"shiftwave-go/internal/resources"
+	"shiftwave-go/internal/setup"
 	"shiftwave-go/internal/types"
+	v1 "shiftwave-go/internal/v1/handler"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,7 +20,7 @@ func main() {
 	rdb := database.NewRedisClient()
 
 	// Load and construct env
-	env := resources.EnvLoader()
+	env := setup.EnvLoader()
 
 	// Create application context
 	ctx := context.Background()
@@ -31,13 +32,14 @@ func main() {
 	app := &types.App{DB: db, ENV: env, RDB: rdb, Context: ctx}
 
 	// Load json data and mapping to database
-	resources.MasterDataLoader(app.DB)
+	setup.MasterDataLoader(app.DB)
 
 	// Middlewares
 	middleware.SetupMiddlewares(e, ctx)
 
 	// Routes
-	handler.SetupRoutes(e, app, ctx)
+	baseHandler.SetupRoutes(e, app)
+	v1.SetupRoutes(e, app)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

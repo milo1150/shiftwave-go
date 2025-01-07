@@ -1,31 +1,38 @@
 package handler
 
 import (
-	"context"
-	"shiftwave-go/internal/middleware"
+	"net/http"
+	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 
+	"github.com/brianvoe/gofakeit/v7"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
-func SetupRoutes(e *echo.Echo, app *types.App, ctx context.Context) {
-	e.POST("/review", func(ctx echo.Context) error {
-		return CreateReviewHandler(ctx, app.DB)
-	}, middleware.IpRateLimiterMiddleware(app.RDB, ctx, 1))
-
-	e.GET("/reviews", func(ctx echo.Context) error {
-		return GetReviewsHandler(ctx, app)
-	})
-
-	e.GET("/review/:id", func(ctx echo.Context) error {
-		return GetReviewHandler(ctx, app)
-	})
-
-	e.GET("/generate-pdf", func(ctx echo.Context) error {
-		return GenerateQRCodeHandler(ctx)
+func SetupRoutes(e *echo.Echo, app *types.App) {
+	e.GET("/generate-pdf", func(c echo.Context) error {
+		return GenerateQRCodeHandler(c)
 	})
 
 	e.GET("/generate-random-reviews", func(c echo.Context) error {
 		return GenerateRandomReviews(c, app.DB)
 	})
+}
+
+// Mock fn
+func GenerateRandomReviews(c echo.Context, db *gorm.DB) error {
+	for i := 0; i < 10; i++ {
+		randomScore := gofakeit.Number(1, 5)
+		randomRemark := gofakeit.LoremIpsumSentence(50)
+		review := &model.Review{
+			Score:    uint(randomScore),
+			Remark:   randomRemark,
+			BranchID: 44,
+		}
+		spew.Dump(review)
+		db.Create(review)
+	}
+	return c.JSON(http.StatusOK, "everything gonna be ok...")
 }

@@ -1,4 +1,4 @@
-package resources
+package setup
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"shiftwave-go/internal/model"
+	"shiftwave-go/internal/types"
 
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -27,8 +28,8 @@ func loadMasterDataJsonFile() []byte {
 	return masterDataByte
 }
 
-func getMasterDataJson(masterDataByte []byte) *model.MasterDataJson {
-	masterDataJson := &model.MasterDataJson{}
+func getMasterDataJson(masterDataByte []byte) *types.MasterDataJson {
+	masterDataJson := &types.MasterDataJson{}
 	if err := json.Unmarshal(masterDataByte, &masterDataJson); err != nil {
 		log.Fatalf("Failed to init masterDataJson: %v", err)
 	}
@@ -41,7 +42,7 @@ func getMasterDataJson(masterDataByte []byte) *model.MasterDataJson {
 	return masterDataJson
 }
 
-func insertBranchesIntoDB(db *gorm.DB, branchJsons []model.BranchMasterData) {
+func insertBranchesIntoDB(db *gorm.DB, branchJsons []types.BranchMasterData) {
 	branches := &[]model.Branch{}
 	if err := db.Find(branches).Error; err != nil {
 		log.Fatalf("Branches not found")

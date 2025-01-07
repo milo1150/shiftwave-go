@@ -26,10 +26,16 @@ or
 
 ## Docker and Run
 
+### Run local server
+
+```bash
+ docker-compose up --build
+```
+
 ### Docker Stop and Remove Everything Related to Docker Compose
 
 ```bash
- docker-compose down -v
+ docker-compose down
 ```
 
 #### down: Stops and removes containers and networks defined in the docker-compose.yml
@@ -45,13 +51,7 @@ or
 --rmi all: Removes all images built by docker-compose.
 -v: Also removes volumes associated with the containers.
 
-## Deploying for Production
-
-### Run local development
-
-```bash
- docker-compose up --build
-```
+## Test production build
 
 ### Build the Production Images
 

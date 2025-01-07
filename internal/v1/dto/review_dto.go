@@ -2,7 +2,7 @@ package dto
 
 import (
 	"shiftwave-go/internal/model"
-	"shiftwave-go/internal/types"
+	"shiftwave-go/internal/v1/types"
 	"time"
 )
 

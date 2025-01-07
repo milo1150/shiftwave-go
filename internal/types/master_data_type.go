@@ -1,6 +1,6 @@
-package model
+package types
 
-// resources/master_data.json
+// Use in resources/master_data.json
 type MasterDataJson struct {
 	Branches []BranchMasterData `json:"branches" validate:"required,dive"`
 }
