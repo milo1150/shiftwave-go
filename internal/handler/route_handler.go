@@ -4,9 +4,11 @@ import (
 	"net/http"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
+	"shiftwave-go/internal/v1/dto"
+	v1types "shiftwave-go/internal/v1/types"
 
 	"github.com/brianvoe/gofakeit/v7"
-	"github.com/davecgh/go-spew/spew"
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -17,22 +19,43 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 	})
 
 	e.GET("/generate-random-reviews", func(c echo.Context) error {
-		return GenerateRandomReviews(c, app.DB)
+		return GenerateRandomReviews(c, app)
 	})
 }
 
+type GenerateRandomReviewsParams struct {
+	BranchId uint `query:"branch_id" validate:"required,number"`
+}
+
 // Mock fn
-func GenerateRandomReviews(c echo.Context, db *gorm.DB) error {
-	for i := 0; i < 10; i++ {
+func GenerateRandomReviews(c echo.Context, app *types.App) error {
+	q := &GenerateRandomReviewsParams{}
+	if err := c.Bind(q); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid params"})
+	}
+
+	v := validator.New()
+	if err := v.Struct(q); err != nil {
+		return c.JSON(http.StatusBadRequest, "Check your branch please.")
+	}
+
+	if err := app.DB.First(&model.Branch{Model: gorm.Model{ID: q.BranchId}}).Error; err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	reviews := []v1types.GetReviewDTO{}
+	for i := 0; i < 15; i++ {
 		randomScore := gofakeit.Number(1, 5)
 		randomRemark := gofakeit.LoremIpsumSentence(50)
 		review := &model.Review{
 			Score:    uint(randomScore),
 			Remark:   randomRemark,
-			BranchID: 44, // TODO: dynamic value, this crash in production test.
+			BranchID: q.BranchId,
 		}
-		spew.Dump(review)
-		db.Create(review)
+		v, _ := dto.TransformGetReview(*review, app.ENV.LocalTimezone)
+		reviews = append(reviews, v)
+		app.DB.Create(review)
 	}
-	return c.JSON(http.StatusOK, "everything gonna be ok...")
+
+	return c.JSON(http.StatusOK, map[string][]v1types.GetReviewDTO{"DB gonna be ok...": reviews})
 }
