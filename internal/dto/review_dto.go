@@ -18,8 +18,8 @@ func TransformGetReviews(reviews []model.Review, timezone *time.Location) []type
 func TransformGetReview(model model.Review, timezone *time.Location) (types.GetReviewDTO, error) {
 	transformed := types.GetReviewDTO{
 		ID:        model.ID,
-		CreatedAt: model.CreatedAt.In(timezone).Format("02/01/2006 15:4"),
-		UpdatedAt: model.UpdatedAt.In(timezone).Format("02/01/2006 15:4"),
+		CreatedAt: model.CreatedAt.In(timezone).Format("02/01/2006 15:04"),
+		UpdatedAt: model.UpdatedAt.In(timezone).Format("02/01/2006 15:04"),
 		Remark:    model.Remark,
 		Score:     model.Score,
 	}
