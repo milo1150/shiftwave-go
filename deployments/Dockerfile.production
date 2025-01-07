@@ -1,7 +1,7 @@
 # Dockerfile.production
 
 # Build stage
-FROM golang:1.23 as builder
+FROM golang:1.23 AS builder
 
 # Set the working directory
 WORKDIR /app
@@ -11,7 +11,7 @@ RUN go install honnef.co/go/tools/cmd/staticcheck@latest
 
 # Copy Go modules and dependencies
 COPY go.mod go.sum ./
-RUN go mod download && go mod verify
+RUN go mod download && go mod tidy && go mod verify
 
 # Copy the rest of the application code
 COPY . .
@@ -22,12 +22,18 @@ RUN staticcheck ./...
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 
+# Copy the .env file from the deployments directory
+COPY deployments/.env ./
+
 # Runtime stage
 FROM debian:bullseye-slim
 WORKDIR /app
 
 # Copy the binary from the builder stage
 COPY --from=builder /app/main .
+
+# Copy the .env file to the runtime image
+COPY --from=builder /app/.env .
 
 # Copy the master_data.json file to the runtime image
 COPY internal/resources/master_data.json ./internal/resources/

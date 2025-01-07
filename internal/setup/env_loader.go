@@ -12,7 +12,7 @@ import (
 func EnvLoader() types.Env {
 	env := types.Env{}
 
-	_, err := godotenv.Read()
+	_, err := godotenv.Read(".env")
 	if err != nil {
 		log.Fatalf("Error loading env")
 	}

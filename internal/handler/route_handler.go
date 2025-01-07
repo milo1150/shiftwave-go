@@ -29,7 +29,7 @@ func GenerateRandomReviews(c echo.Context, db *gorm.DB) error {
 		review := &model.Review{
 			Score:    uint(randomScore),
 			Remark:   randomRemark,
-			BranchID: 44,
+			BranchID: 44, // TODO: dynamic value, this crash in production test.
 		}
 		spew.Dump(review)
 		db.Create(review)
