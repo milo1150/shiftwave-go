@@ -42,6 +42,7 @@ func InitDatabase() *gorm.DB {
 
 func getModels() []interface{} {
 	return []interface{}{
+		&model.User{},
 		&model.Review{},
 		&model.Branch{},
 	}
