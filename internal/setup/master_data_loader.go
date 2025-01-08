@@ -45,7 +45,7 @@ func getMasterDataJson(masterDataByte []byte) *types.MasterDataJson {
 func insertBranchesIntoDB(db *gorm.DB, branchJsons []types.BranchMasterData) {
 	branches := &[]model.Branch{}
 	if err := db.Find(branches).Error; err != nil {
-		log.Fatalf("Branches not found")
+		log.Fatalf("Error to find branches: %s", err)
 	}
 
 	check := make(map[string]string)
@@ -64,10 +64,34 @@ func insertBranchesIntoDB(db *gorm.DB, branchJsons []types.BranchMasterData) {
 	}
 }
 
+func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData) {
+	users := &[]model.User{}
+	if err := db.Find(users).Error; err != nil {
+		log.Fatalf("Find users error: %s", err)
+	}
+
+	check := map[string]string{}
+	for _, user := range *users {
+		check[user.Username] = ""
+	}
+
+	for _, userJson := range userJsons {
+		if _, existed := check[userJson.Username]; !existed {
+			if err := db.Create(&model.User{Username: userJson.Username}); err != nil {
+				log.Fatalf("Failed to inserted %v into User table: %v", userJson.Username, err)
+			} else {
+				log.Printf("Inserted %v into User table.", userJson.Username)
+			}
+		}
+	}
+}
+
 func MasterDataLoader(db *gorm.DB) {
 	masterDataByte := loadMasterDataJsonFile()
 
 	masterDataJson := getMasterDataJson(masterDataByte)
 
 	insertBranchesIntoDB(db, masterDataJson.Branches)
+
+	insertUserIntoDB(db, masterDataJson.Users)
 }
