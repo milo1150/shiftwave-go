@@ -14,6 +14,6 @@ type User struct {
 	Branches     []Branch `gorm:"many2many:users_branches"`
 }
 
-func (u *User) BeforeDelete() error {
+func (u *User) BeforeDelete(tx *gorm.DB) error {
 	return errors.New("deletion of user records is not allowed")
 }

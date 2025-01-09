@@ -48,7 +48,7 @@ func GetReviewsHandler(c echo.Context, app *types.App) error {
 
 	result, err := v1repository.GetReviews(app, q)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "Query error")
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
 
 	return c.JSON(http.StatusOK, result)

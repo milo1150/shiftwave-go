@@ -4,8 +4,7 @@ import (
 	"net/http"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
-	"shiftwave-go/internal/v1/dto"
-	v1types "shiftwave-go/internal/v1/types"
+	v1dto "shiftwave-go/internal/v1/dto"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/go-playground/validator/v10"
@@ -43,7 +42,7 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	reviews := []v1types.GetReviewDTO{}
+	reviews := []v1dto.GetReviewDTO{}
 	for i := 0; i < 15; i++ {
 		randomScore := gofakeit.Number(1, 5)
 		randomRemark := gofakeit.LoremIpsumSentence(50)
@@ -52,10 +51,10 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 			Remark:   randomRemark,
 			BranchID: q.BranchId,
 		}
-		v, _ := dto.TransformGetReview(*review, app.ENV.LocalTimezone)
+		v, _ := v1dto.TransformGetReview(*review, app.ENV.LocalTimezone)
 		reviews = append(reviews, v)
 		app.DB.Create(review)
 	}
 
-	return c.JSON(http.StatusOK, map[string][]v1types.GetReviewDTO{"DB gonna be ok...": reviews})
+	return c.JSON(http.StatusOK, map[string][]v1dto.GetReviewDTO{"DB gonna be ok...": reviews})
 }
