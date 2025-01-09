@@ -16,7 +16,7 @@ func CreateReview(db *gorm.DB, payload *v1types.CreateReviewPayload) error {
 }
 
 func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsResponse, error) {
-	review := &[]model.Review{}
+	reviews := &[]model.Review{}
 
 	page := 1
 	if q.Page != nil {
@@ -67,8 +67,6 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsR
 			month := *q.Month
 			startOfMonth := time.Date(time.Now().Year(), time.Month(month), 1, 0, 0, 0, 0, time.Now().Location())
 			endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-1 * time.Second)
-			fmt.Println("startOfMonth", startOfMonth)
-			fmt.Println("endOfMonth", endOfMonth)
 			dbQuery = dbQuery.Where("created_at BETWEEN ? AND ?", startOfMonth, endOfMonth)
 
 		case "year":
@@ -91,19 +89,16 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsR
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
 	// Preload Branch and execute query
-	dbQuery.Preload("Branch").Order("id DESC").Find(review)
-
-	// Execute
-	if err := dbQuery.Error; err != nil {
+	if err := dbQuery.Preload("Branch").Order("id DESC").Find(reviews).Error; err != nil {
 		return nil, err
 	}
 
 	// Transform result
-	reviews := v1dto.TransformGetReviews(*review, app.ENV.LocalTimezone)
+	reviewsDto := v1dto.TransformGetReviews(*reviews, app.ENV.LocalTimezone)
 	result := &v1types.ReviewsResponse{
 		Page:       page,
 		PageSize:   pageSize,
-		Items:      reviews,
+		Items:      reviewsDto,
 		TotalItems: totalItems,
 	}
 
