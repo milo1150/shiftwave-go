@@ -82,13 +82,13 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsR
 		}
 	}
 
-	// Calculate pagination
-	offset := (page - 1) * pageSize
-	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
-
 	// Count
 	var totalItems int64
 	dbQuery.Model(&model.Review{}).Count(&totalItems)
+
+	// Calculate pagination
+	offset := (page - 1) * pageSize
+	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
 	// Preload Branch and execute query
 	dbQuery.Preload("Branch").Order("id DESC").Find(review)
