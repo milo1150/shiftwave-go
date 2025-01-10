@@ -1,16 +1,17 @@
 package services
 
 import (
-	"fmt"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/utils"
 
 	v1types "shiftwave-go/internal/v1/types"
 )
 
-func GetAverageRating(reviews []model.Review) (*v1types.AverageRatingResponse, error) {
+func GetAverageRating(reviews []model.Review) *v1types.AverageRatingResponse {
+	result := &v1types.AverageRatingResponse{}
+
 	if len(reviews) <= 0 {
-		return nil, fmt.Errorf("data not found")
+		return result
 	}
 
 	var (
@@ -20,7 +21,6 @@ func GetAverageRating(reviews []model.Review) (*v1types.AverageRatingResponse, e
 		fourScores  []model.Review
 		fiveScores  []model.Review
 	)
-	result := &v1types.AverageRatingResponse{}
 
 	for _, review := range reviews {
 		switch review.Score {
@@ -68,5 +68,5 @@ func GetAverageRating(reviews []model.Review) (*v1types.AverageRatingResponse, e
 	averageRating := ((5 * fiveScoreCount) + (4 * fourScoreCount) + (3 * threeScoreCount) + (2 * twoScoreCount) + oneScoreCount) / totalCount
 	result.AverageRating = utils.RoundToTwoDecimals(averageRating)
 
-	return result, nil
+	return result
 }

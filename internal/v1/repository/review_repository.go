@@ -157,10 +157,7 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 		}
 	}
 
-	result, err := v1services.GetAverageRating(*reviews)
-	if err != nil {
-		return nil, err
-	}
+	result := v1services.GetAverageRating(*reviews)
 
 	return result, nil
 }
