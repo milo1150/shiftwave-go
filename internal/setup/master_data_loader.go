@@ -77,7 +77,7 @@ func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData) {
 
 	for _, userJson := range userJsons {
 		if _, existed := check[userJson.Username]; !existed {
-			if err := db.Create(&model.User{Username: userJson.Username}); err != nil {
+			if err := db.Create(&model.User{Username: userJson.Username}).Error; err != nil {
 				log.Fatalf("Failed to inserted %v into User table: %v", userJson.Username, err)
 			} else {
 				log.Printf("Inserted %v into User table.", userJson.Username)
