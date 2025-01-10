@@ -28,18 +28,3 @@ type ReviewsResponse struct {
 	TotalItems int64                `json:"total_items" validate:"numeric"`
 	Items      []v1dto.GetReviewDTO `json:"items"`
 }
-
-type AverageRatingResponse struct {
-	TotalCount       int     `json:"total_review"`
-	AverageRating    float64 `json:"average_rating"`
-	FiveStarCount    int     `json:"five_star_count"`
-	FiveStarPercent  float64 `json:"five_star_percent"`
-	FourStarCount    int     `json:"four_star_count"`
-	FourStarPercent  float64 `json:"four_star_percent"`
-	ThreeStarCount   int     `json:"three_star_count"`
-	ThreeStarPercent float64 `json:"three_star_percent"`
-	TwoStarCount     int     `json:"two_star_count"`
-	TwoStarPercent   float64 `json:"two_star_percent"`
-	OneStarCount     int     `json:"one_star_count"`
-	OneStarPercent   float64 `json:"one_star_percent"`
-}

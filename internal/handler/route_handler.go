@@ -26,6 +26,7 @@ type GenerateRandomReviewsParams struct {
 	BranchId uint `query:"branch_id" validate:"required,number"`
 }
 
+// TODO: change to POST with dynamic payload
 // Mock fn
 func GenerateRandomReviews(c echo.Context, app *types.App) error {
 	q := &GenerateRandomReviewsParams{}

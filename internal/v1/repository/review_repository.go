@@ -5,7 +5,6 @@ import (
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 	v1dto "shiftwave-go/internal/v1/dto"
-	v1services "shiftwave-go/internal/v1/services"
 	v1types "shiftwave-go/internal/v1/types"
 	"time"
 
@@ -48,35 +47,32 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams, loc time.Location)
 			if q.StartDate == nil {
 				return nil, fmt.Errorf("invalid start_date")
 			}
-			startDate, _ := time.Parse(time.DateOnly, *q.StartDate)
-			endDate := startDate.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
-			dbQuery = dbQuery.Where("created_at BETWEEN ? AND ?", startDate, endDate)
+
+			dateQuery, _ := getDateReviewsQuery(app.DB, *q.StartDate, loc)
+			dbQuery = dateQuery
 
 		case "date_range":
 			if q.StartDate == nil || q.EndDate == nil {
 				return nil, fmt.Errorf("invalid start_date and end_date")
 			}
-			startDate, _ := time.Parse(time.DateOnly, *q.StartDate)
-			endDate, _ := time.Parse(time.DateOnly, *q.EndDate)
-			endDate = endDate.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
-			dbQuery = dbQuery.Where("created_at BETWEEN ? AND ?", startDate, endDate)
+
+			dateRangeQuery, _ := getDateRangeReviewsQuery(app.DB, *q.StartDate, *q.EndDate, loc)
+			dbQuery = dateRangeQuery
 
 		case "month":
-			if q.Month == nil {
-				return nil, fmt.Errorf("invalid month")
+			if q.Month == nil || q.Year == nil {
+				return nil, fmt.Errorf("invalid month and year")
 			}
-			month := *q.Month
-			startOfMonth := time.Date(time.Now().Year(), time.Month(month), 1, 0, 0, 0, 0, time.Now().Location())
-			endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-1 * time.Second)
-			dbQuery = dbQuery.Where("created_at BETWEEN ? AND ?", startOfMonth, endOfMonth)
+
+			monthQuery, _ := getMonthReviewsQuery(app.DB, *q.Month, *q.Year, *app.ENV.LocalTimezone)
+			dbQuery = monthQuery
 
 		case "year":
 			if q.Year == nil {
 				return nil, fmt.Errorf("invalid year")
 			}
 
-			year := *q.Year
-			yearQuery, _ := getQueryReviewsInYear(app.DB, year, loc)
+			yearQuery, _ := getYearReviewsQuery(app.DB, *q.Year, loc)
 			dbQuery = yearQuery
 		}
 	}
@@ -123,9 +119,9 @@ func GetReview(app *types.App, id int) (*v1dto.GetReviewDTO, error) {
 	return &result, nil
 }
 
-func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.Location) (*v1types.AverageRatingResponse, error) {
+func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.Location) (*v1dto.AverageRatingDTO, error) {
 	if q.DateType == nil {
-		return nil, fmt.Errorf("date_type required")
+		return nil, fmt.Errorf("date_type is required")
 	}
 
 	reviews := &[]model.Review{}
@@ -133,36 +129,51 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 	switch *q.DateType {
 	case "date":
 		if q.StartDate == nil {
-			return nil, fmt.Errorf("start_date required")
+			return nil, fmt.Errorf("start_date is required")
+		}
+
+		dateQuery, _ := getDateReviewsQuery(db, *q.StartDate, location)
+		if err := dateQuery.Find(reviews).Error; err != nil {
+			return nil, err
 		}
 
 	case "date_range":
 		if q.StartDate == nil || q.EndDate == nil {
-			return nil, fmt.Errorf("start_date and end_date required")
+			return nil, fmt.Errorf("start_date and end_date are required")
+		}
+
+		dateRangeQuery, _ := getDateRangeReviewsQuery(db, *q.StartDate, *q.EndDate, location)
+		if err := dateRangeQuery.Find(reviews).Error; err != nil {
+			return nil, err
 		}
 
 	case "month":
-		if q.Month == nil {
-			return nil, fmt.Errorf("month required")
+		if q.Month == nil || q.Year == nil {
+			return nil, fmt.Errorf("month and year are required")
+		}
+
+		monthQuery, _ := getMonthReviewsQuery(db, *q.Month, *q.Year, location)
+		if err := monthQuery.Find(reviews).Error; err != nil {
+			return nil, err
 		}
 
 	case "year":
 		if q.Year == nil {
-			return nil, fmt.Errorf("year required")
+			return nil, fmt.Errorf("year is required")
 		}
 
-		yearQuery, _ := getQueryReviewsInYear(db, *q.Year, location)
+		yearQuery, _ := getYearReviewsQuery(db, *q.Year, location)
 		if err := yearQuery.Find(reviews).Error; err != nil {
 			return nil, err
 		}
 	}
 
-	result := v1services.GetAverageRating(*reviews)
+	result := v1dto.GetAverageRating(*reviews)
 
 	return result, nil
 }
 
-func getQueryReviewsInYear(db *gorm.DB, year int, loc time.Location) (*gorm.DB, error) {
+func getYearReviewsQuery(db *gorm.DB, year int, loc time.Location) (*gorm.DB, error) {
 	location, err := time.LoadLocation(loc.String())
 	if err != nil {
 		return nil, fmt.Errorf("invalid location")
@@ -172,6 +183,49 @@ func getQueryReviewsInYear(db *gorm.DB, year int, loc time.Location) (*gorm.DB, 
 	endOfYear := startOfYear.AddDate(1, 0, 0).Add(-1 * time.Second)
 
 	query := db.Where("created_at BETWEEN ? AND ?", startOfYear, endOfYear)
+
+	return query, nil
+}
+
+func getMonthReviewsQuery(db *gorm.DB, month int, year int, loc time.Location) (*gorm.DB, error) {
+	location, err := time.LoadLocation(loc.String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid location")
+	}
+
+	startOfMonth := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, location)
+	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-1 * time.Second)
+
+	query := db.Where("created_at BETWEEN ? AND ?", startOfMonth, endOfMonth)
+
+	return query, nil
+}
+
+func getDateRangeReviewsQuery(db *gorm.DB, start string, end string, loc time.Location) (*gorm.DB, error) {
+	location, err := time.LoadLocation(loc.String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid location")
+	}
+
+	startDate, _ := time.ParseInLocation(time.DateOnly, start, location)
+	endDate, _ := time.ParseInLocation(time.DateOnly, end, location)
+	endDate = endDate.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+
+	query := db.Where("created_at BETWEEN ? AND ?", startDate, endDate)
+
+	return query, nil
+}
+
+func getDateReviewsQuery(db *gorm.DB, start string, loc time.Location) (*gorm.DB, error) {
+	location, err := time.LoadLocation(loc.String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid location")
+	}
+
+	startDate, _ := time.ParseInLocation(time.DateOnly, start, location)
+	endDate := startDate.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+
+	query := db.Where("created_at BETWEEN ? AND ?", startDate, endDate)
 
 	return query, nil
 }
