@@ -65,7 +65,8 @@ func GetAverageRating(reviews []model.Review) (*v1types.AverageRatingResponse, e
 	result.OneStarPercent = utils.RoundFloat64(oneScoreCount / totalCount * 100)
 
 	// Calculate Average
-	result.AverageRating = utils.RoundFloat64(((5 * fiveScoreCount) + (4 * fourScoreCount) + (3 * threeScoreCount) + (2 * twoScoreCount) + oneScoreCount) / totalCount)
+	averageRating := ((5 * fiveScoreCount) + (4 * fourScoreCount) + (3 * threeScoreCount) + (2 * twoScoreCount) + oneScoreCount) / totalCount
+	result.AverageRating = utils.RoundToTwoDecimals(averageRating)
 
 	return result, nil
 }

@@ -10,3 +10,8 @@ func RoundFloat64(value float64) float64 {
 		return math.Floor(value)
 	}
 }
+
+func RoundToTwoDecimals(value float64) float64 {
+	// Multiply by 100, truncate, and divide back by 100
+	return math.Floor(value*100) / 100
+}
