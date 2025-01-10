@@ -12,6 +12,10 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 		return GetReviewsHandler(c, app)
 	})
 
+	e.GET("/v1/reviews/average-rating", func(c echo.Context) error {
+		return GetAverageRatingHandler(c, app)
+	})
+
 	e.POST("/v1/review", func(c echo.Context) error {
 		return CreateReviewHandler(c, app.DB)
 	}, middleware.IpRateLimiterMiddleware(app.RDB, app.Context, 1))

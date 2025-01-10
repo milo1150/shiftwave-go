@@ -5,6 +5,7 @@ import (
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 	v1dto "shiftwave-go/internal/v1/dto"
+	v1services "shiftwave-go/internal/v1/services"
 	v1types "shiftwave-go/internal/v1/types"
 	"time"
 
@@ -15,7 +16,7 @@ func CreateReview(db *gorm.DB, payload *v1types.CreateReviewPayload) error {
 	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
 }
 
-func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsResponse, error) {
+func GetReviews(app *types.App, q *v1types.ReviewQueryParams, loc time.Location) (*v1types.ReviewsResponse, error) {
 	reviews := &[]model.Review{}
 
 	page := 1
@@ -73,10 +74,10 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams) (*v1types.ReviewsR
 			if q.Year == nil {
 				return nil, fmt.Errorf("invalid year")
 			}
+
 			year := *q.Year
-			startOfYear := time.Date(year, 1, 1, 0, 0, 0, 0, time.Now().Location())
-			endOfYear := startOfYear.AddDate(1, 0, 0).Add(-1 * time.Second)
-			dbQuery = dbQuery.Where("created_at BETWEEN ? AND ?", startOfYear, endOfYear)
+			yearQuery, _ := getQueryReviewsInYear(app.DB, year, loc)
+			dbQuery = yearQuery
 		}
 	}
 
@@ -120,4 +121,60 @@ func GetReview(app *types.App, id int) (*v1dto.GetReviewDTO, error) {
 	}
 
 	return &result, nil
+}
+
+func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.Location) (*v1types.AverageRatingResponse, error) {
+	if q.DateType == nil {
+		return nil, fmt.Errorf("date_type required")
+	}
+
+	reviews := &[]model.Review{}
+
+	switch *q.DateType {
+	case "date":
+		if q.StartDate == nil {
+			return nil, fmt.Errorf("start_date required")
+		}
+
+	case "date_range":
+		if q.StartDate == nil || q.EndDate == nil {
+			return nil, fmt.Errorf("start_date and end_date required")
+		}
+
+	case "month":
+		if q.Month == nil {
+			return nil, fmt.Errorf("month required")
+		}
+
+	case "year":
+		if q.Year == nil {
+			return nil, fmt.Errorf("year required")
+		}
+
+		yearQuery, _ := getQueryReviewsInYear(db, *q.Year, location)
+		if err := yearQuery.Find(reviews).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	result, err := v1services.GetAverageRating(*reviews)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+func getQueryReviewsInYear(db *gorm.DB, year int, loc time.Location) (*gorm.DB, error) {
+	location, err := time.LoadLocation(loc.String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid location")
+	}
+
+	startOfYear := time.Date(year, 1, 1, 0, 0, 0, 0, time.Now().In(location).Location())
+	endOfYear := startOfYear.AddDate(1, 0, 0).Add(-1 * time.Second)
+
+	query := db.Where("created_at BETWEEN ? AND ?", startOfYear, endOfYear)
+
+	return query, nil
 }

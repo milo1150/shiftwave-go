@@ -45,7 +45,7 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 	reviews := []v1dto.GetReviewDTO{}
 	for i := 0; i < 15; i++ {
 		randomScore := gofakeit.Number(1, 5)
-		randomRemark := gofakeit.LoremIpsumSentence(50)
+		randomRemark := gofakeit.LoremIpsumSentence(30)
 		review := &model.Review{
 			Score:    uint(randomScore),
 			Remark:   randomRemark,

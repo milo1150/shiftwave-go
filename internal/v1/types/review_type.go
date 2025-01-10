@@ -25,16 +25,21 @@ type ReviewQueryParams struct {
 type ReviewsResponse struct {
 	Page       int                  `json:"page" validate:"numeric"`
 	PageSize   int                  `json:"page_size" validate:"numeric"`
-	TotalItems int64                `json:"total_items"`
+	TotalItems int64                `json:"total_items" validate:"numeric"`
 	Items      []v1dto.GetReviewDTO `json:"items"`
 }
 
-type ReviewSummaryResponse struct {
-	TotalReviews  int     `json:"total_reviews"`
-	AverageRating float32 `json:"average_rating"`
-	FiveStar      int     `json:"five_star"`
-	FourStar      int     `json:"four_star"`
-	ThreeStar     int     `json:"three_star"`
-	TwoStar       int     `json:"two_star"`
-	OneStar       int     `json:"one_star"`
+type AverageRatingResponse struct {
+	TotalCount       int     `json:"total_review"`
+	AverageRating    float64 `json:"average_rating"`
+	FiveStarCount    int     `json:"five_star_count"`
+	FiveStarPercent  float64 `json:"five_star_percent"`
+	FourStarCount    int     `json:"four_star_count"`
+	FourStarPercent  float64 `json:"four_star_percent"`
+	ThreeStarCount   int     `json:"three_star_count"`
+	ThreeStarPercent float64 `json:"three_star_percent"`
+	TwoStarCount     int     `json:"two_star_count"`
+	TwoStarPercent   float64 `json:"two_star_percent"`
+	OneStarCount     int     `json:"one_star_count"`
+	OneStarPercent   float64 `json:"one_star_percent"`
 }
