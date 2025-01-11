@@ -1,5 +1,6 @@
-## CLI
-- [Common CLI](https://github.com/milo1150/cli-cmds)
+## Basic CLI
+
+- [Click](https://github.com/milo1150/cli-cmds)
 
 ## Directory Breakdown
 
