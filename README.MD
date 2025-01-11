@@ -1,85 +1,24 @@
-# WELCOME TO THE CLUB
+## Directory Breakdown
 
-## DB
+- internal/: Contains the core application code, segregated into
 
-### if Docker & Postgres: Failed to bind tcp 0.0.0.0:5432 address already in use
+- database/: Database connection setup and migrations
 
-``` bash
-sudo lsof -i :5432
-```
+- handlers/: HTTP handlers managing incoming requests
 
-``` bash
-sudo kill -9 <PID>
-```
+- repositories/: Data access layer interacting with GORM
 
-### CLI check db
+- services/: Business logic
 
-``` bash
- pgcli postgres://postgres:postgres@0.0.0.0:5432/mydb
-```
+- setup/: JSON data loader
 
-or
+- models/: Database models representing your data structures
 
-``` bash
- pgcli postgres://postgres:postgres@127.0.0.1:5432/mydb
-```
+- configs/: Configuration management
 
-## Docker and Run
+- cmd/: Entry point(s) of your application
 
-### Run local server
-
-```bash
- docker-compose up --build
-```
-
-### Docker Stop and Remove Everything Related to Docker Compose
-
-```bash
- docker-compose down
-```
-
-#### down: Stops and removes containers and networks defined in the docker-compose.yml
-
-#### -v: Removes any associated volumes
-
-### Remove All Images Built by Docker Compose: To remove images built by Docker Compose, include the --rmi flag
-
-```bash
- docker-compose down --rmi all -v
-```
-
---rmi all: Removes all images built by docker-compose.
--v: Also removes volumes associated with the containers.
-
-## Test production build
-
-### Build the Production Images
-
-```bash
- docker-compose -f deployments/docker-compose.production.yml up --build
-```
-
-## Folder Structure
-
-### Directory Breakdown
-
-cmd/: Entry point(s) of your application
-
-internal/: Contains the core application code, segregated into
-
-handlers/: HTTP handlers managing incoming requests
-
-services/: Business logic
-
-repositories/: Data access layer interacting with GORM
-
-models/: Database models representing your data structures
-
-database/: Database connection setup and migrations
-
-configs/: Configuration management
-
-pkg/, api/, configs/, scripts/, tests/, docs/: As previously described
+- pkg/, api/, configs/, scripts/, tests/, docs/: As previously described
 
 ```bash
 your-service/
