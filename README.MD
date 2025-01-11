@@ -1,3 +1,6 @@
+## CLI
+- [Common CLI](https://github.com/milo1150/cli-cmds)
+
 ## Directory Breakdown
 
 - internal/: Contains the core application code, segregated into
