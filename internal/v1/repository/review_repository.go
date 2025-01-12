@@ -12,7 +12,12 @@ import (
 )
 
 func CreateReview(db *gorm.DB, payload *v1types.CreateReviewPayload) error {
-	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch}).Error
+	parseLang, err := types.ParseLang(payload.Lang)
+	if err != nil {
+		return err
+	}
+
+	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch, Lang: *parseLang}).Error
 }
 
 func GetReviews(app *types.App, q *v1types.ReviewQueryParams, loc time.Location) (*v1types.ReviewsResponse, error) {

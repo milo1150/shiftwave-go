@@ -14,6 +14,7 @@ require (
 	golang.org/x/time v0.9.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
+	github.com/davecgh/go-spew v1.1.1
 )
 
 require (
