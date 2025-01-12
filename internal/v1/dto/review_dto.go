@@ -2,16 +2,18 @@ package dto
 
 import (
 	"shiftwave-go/internal/model"
+	mainTypes "shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	"time"
 )
 
 type GetReviewDTO struct {
-	ID        uint   `json:"id"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Remark    string `json:"remark"`
-	Score     uint   `json:"score"`
+	ID        uint           `json:"id"`
+	CreatedAt string         `json:"created_at"`
+	UpdatedAt string         `json:"updated_at"`
+	Remark    string         `json:"remark"`
+	Score     uint           `json:"score"`
+	Lang      mainTypes.Lang `json:"lang"`
 }
 
 func TransformGetReviews(reviews []model.Review, timezone *time.Location) []GetReviewDTO {
@@ -30,6 +32,7 @@ func TransformGetReview(model model.Review, timezone *time.Location) (GetReviewD
 		UpdatedAt: model.UpdatedAt.In(timezone).Format("02/01/2006 15:04"),
 		Remark:    model.Remark,
 		Score:     model.Score,
+		Lang:      model.Lang,
 	}
 	return transformed, nil
 }

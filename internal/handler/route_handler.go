@@ -44,17 +44,22 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 	}
 
 	reviews := []v1dto.GetReviewDTO{}
-	for i := 0; i < 15; i++ {
+	for i := 0; i < 10; i++ {
 		randomScore := gofakeit.Number(1, 5)
 		randomRemark := gofakeit.LoremIpsumSentence(30)
 		review := &model.Review{
 			Score:    uint(randomScore),
 			Remark:   randomRemark,
 			BranchID: q.BranchId,
+			Lang:     "EN",
 		}
+
+		if err := app.DB.Create(review).Error; err != nil {
+			return c.JSON(http.StatusInternalServerError, err.Error())
+		}
+
 		v, _ := v1dto.TransformGetReview(*review, app.ENV.LocalTimezone)
 		reviews = append(reviews, v)
-		app.DB.Create(review)
 	}
 
 	return c.JSON(http.StatusOK, map[string][]v1dto.GetReviewDTO{"DB gonna be ok...": reviews})

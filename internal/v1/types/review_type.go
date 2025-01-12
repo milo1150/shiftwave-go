@@ -1,13 +1,15 @@
 package types
 
 import (
+	mainTypes "shiftwave-go/internal/types"
 	v1dto "shiftwave-go/internal/v1/dto"
 )
 
 type CreateReviewPayload struct {
-	Remark string `json:"remark" validate:"omitempty"`
-	Score  uint   `json:"score" validate:"required,min=1,max=5"`
-	Branch uint   `json:"branch" validate:"required,numeric"`
+	Remark string         `json:"remark" validate:"omitempty"`
+	Score  uint           `json:"score" validate:"required,min=1,max=5"`
+	Branch uint           `json:"branch" validate:"required,numeric"`
+	Lang   mainTypes.Lang `json:"lang" validate:"required,oneof=EN, TH, MY"` // always keep update enum with types.Lang
 }
 
 type ReviewQueryParams struct {

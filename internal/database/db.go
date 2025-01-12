@@ -19,23 +19,29 @@ func InitDatabase() *gorm.DB {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 
-	// Ping the database to verify the connection
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatalf("Failed to get database instance: %v", err)
 	}
 
+	// Validate lang column in Reviews table
+	err = db.Exec("UPDATE reviews SET lang = 'EN' WHERE lang IS NULL").Error
+	if err != nil {
+		log.Fatalf("Failed to update default lang column in Reviews table")
+	}
+
+	// Ping the database to verify the connection
 	if err := sqlDB.Ping(); err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
 	}
-
-	fmt.Println("Connected to PostgreSQL using GORM!")
 
 	// Migrate the schema
 	err = db.AutoMigrate(getModels()...)
 	if err != nil {
 		log.Fatalf("Failed to migrate db.")
 	}
+
+	fmt.Println("Connected to PostgreSQL using GORM!")
 
 	return db
 }
