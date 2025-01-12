@@ -21,6 +21,10 @@ func (l Lang) IsValid() bool {
 	}
 }
 
+func (l Lang) ToString() string {
+	return string(l)
+}
+
 func ParseLang(str string) (*Lang, error) {
 	switch str {
 	case "TH":
