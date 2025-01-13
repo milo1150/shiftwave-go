@@ -5,6 +5,7 @@ import (
 	"shiftwave-go/internal/database"
 	baseHandler "shiftwave-go/internal/handler"
 	"shiftwave-go/internal/middleware"
+	"shiftwave-go/internal/scheduler"
 	"shiftwave-go/internal/setup"
 	"shiftwave-go/internal/types"
 	v1 "shiftwave-go/internal/v1/handler"
@@ -40,6 +41,9 @@ func main() {
 	// Routes
 	baseHandler.SetupRoutes(e, app)
 	v1.SetupRoutes(e, app)
+
+	// Cronjob
+	scheduler.OpenAITranslateScheduler()
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
