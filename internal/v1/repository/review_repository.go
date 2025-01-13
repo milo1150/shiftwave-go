@@ -234,3 +234,22 @@ func getDateReviewsQuery(db *gorm.DB, start string, loc time.Location) (*gorm.DB
 
 	return query, nil
 }
+
+func RetrieveReviewsByLang(db *gorm.DB, lang types.Lang, loc time.Location, duration time.Duration) (*[]model.Review, error) {
+	location, err := time.LoadLocation(loc.String())
+	if err != nil {
+		return nil, fmt.Errorf("invalid location")
+	}
+
+	reviews := &[]model.Review{}
+	startTime := time.Now().In(location).Add(-1 * time.Hour)
+	endTime := startTime.Add(1 * time.Hour)
+
+	query := db.Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, endTime, lang)
+
+	if err := query.Find(reviews).Error; err != nil {
+		return nil, fmt.Errorf("error: %v", err)
+	}
+
+	return reviews, nil
+}

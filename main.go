@@ -43,7 +43,7 @@ func main() {
 	v1.SetupRoutes(e, app)
 
 	// Cronjob
-	scheduler.OpenAITranslateScheduler()
+	scheduler.OpenAITranslateScheduler(app)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))

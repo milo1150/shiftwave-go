@@ -10,6 +10,7 @@ import (
 
 type Env struct {
 	LocalTimezone *time.Location
+	OpenAI        string
 }
 
 type App struct {
