@@ -242,10 +242,10 @@ func RetrieveReviewsByLang(db *gorm.DB, lang types.Lang, loc time.Location, dura
 	}
 
 	reviews := &[]model.Review{}
-	startTime := time.Now().In(location).Add(-1 * time.Hour)
-	endTime := startTime.Add(1 * time.Hour)
+	currentTime := time.Now().In(location)
+	startTime := currentTime.Add(-10 * time.Hour)
 
-	query := db.Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, endTime, lang)
+	query := db.Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, currentTime, lang)
 
 	if err := query.Find(reviews).Error; err != nil {
 		return nil, fmt.Errorf("error: %v", err)
