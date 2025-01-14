@@ -19,3 +19,5 @@ type App struct {
 	RDB     *redis.Client
 	Context context.Context
 }
+
+type Object map[string]interface{}

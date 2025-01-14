@@ -50,8 +50,6 @@ func getTranslateMessage(app *types.App) (*assistantMessage, *userMessage, error
 
 	for _, review := range *reviews {
 		idString := strconv.FormatUint(uint64(review.ID), 10)
-		fmt.Println("ID:", idString)
-		fmt.Println("Remark:", review.Remark)
 		v := translateResponse{
 			idString: review.Remark,
 		}
@@ -88,19 +86,19 @@ func start(app *types.App) {
 		Model: openai.F(openai.ChatModelGPT4oMini),
 		ResponseFormat: openai.F(openai.ChatCompletionNewParamsResponseFormatUnion(openai.ChatCompletionNewParamsResponseFormat{
 			Type: openai.F(openai.ChatCompletionNewParamsResponseFormatTypeJSONSchema),
-			JSONSchema: openai.F(interface{}(map[string]interface{}{
+			JSONSchema: openai.F(interface{}(types.Object{
 				"name":   "translate",
 				"strict": false,
-				"schema": map[string]interface{}{
+				"schema": types.Object{
 					"type": "object",
-					"properties": map[string]interface{}{
-						"results": map[string]interface{}{
+					"properties": types.Object{
+						"results": types.Object{
 							"type": "array",
-							"items": map[string]interface{}{
-								"id": map[string]interface{}{
+							"items": types.Object{
+								"id": types.Object{
 									"type": "string",
 								},
-								"text": map[string]interface{}{
+								"text": types.Object{
 									"type": "string",
 								},
 							},
@@ -115,6 +113,7 @@ func start(app *types.App) {
 		log.Printf("Error from OpenAI: %v \n", err.Error())
 	}
 
+	log.Printf("TotalTokens: %v, PromptTokens: %v, CompletionTokens: %v \n", chatCompletion.Usage.TotalTokens, chatCompletion.Usage.PromptTokens, chatCompletion.Usage.CompletionTokens)
 	fmt.Println(chatCompletion.Choices[0].Message.Content)
 
 	// var parseResponse map[string]interface{}
@@ -128,23 +127,15 @@ func OpenAITranslateScheduler(app *types.App) {
 		log.Fatalf("Error init scheduler: %v", err)
 	}
 
-	count := 0
-
 	// add a job to the scheduler
 	_, err = s.NewJob(
-		gocron.DurationJob(
-			5*time.Second,
-		),
+		gocron.OneTimeJob(gocron.OneTimeJobStartImmediately()),
+		// gocron.DurationJob(
+		// 	5*time.Second,
+		// ),
 		gocron.NewTask(
 			func() {
-				log.Println(count)
-				if count == 1 {
-					s.Shutdown()
-				}
-
-				start(app)
-
-				count++
+				// start(app)
 			},
 		),
 	)
