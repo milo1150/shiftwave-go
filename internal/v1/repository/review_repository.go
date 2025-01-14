@@ -6,8 +6,10 @@ import (
 	"shiftwave-go/internal/types"
 	v1dto "shiftwave-go/internal/v1/dto"
 	v1types "shiftwave-go/internal/v1/types"
+	"strconv"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"gorm.io/gorm"
 )
 
@@ -235,7 +237,7 @@ func getDateReviewsQuery(db *gorm.DB, start string, loc time.Location) (*gorm.DB
 	return query, nil
 }
 
-func RetrieveReviewsByLang(db *gorm.DB, lang types.Lang, loc time.Location, duration time.Duration) (*[]model.Review, error) {
+func RetrieveReviewsByLang(db *gorm.DB, loc time.Location, lang types.Lang, duration time.Duration) (*[]model.Review, error) {
 	location, err := time.LoadLocation(loc.String())
 	if err != nil {
 		return nil, fmt.Errorf("invalid location")
@@ -243,13 +245,38 @@ func RetrieveReviewsByLang(db *gorm.DB, lang types.Lang, loc time.Location, dura
 
 	reviews := &[]model.Review{}
 	currentTime := time.Now().In(location)
-	startTime := currentTime.Add(-10 * time.Hour)
+	startTime := currentTime.Add(duration)
 
-	query := db.Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, currentTime, lang)
+	query := db.Debug().Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, currentTime, lang).
+		Where("remark_en = ''").
+		Order("id DESC")
 
 	if err := query.Find(reviews).Error; err != nil {
 		return nil, fmt.Errorf("error: %v", err)
 	}
 
+	spew.Dump(reviews)
+
 	return reviews, nil
+}
+
+func UpdateReviewsFromTranslateResult(db *gorm.DB, datas []v1types.TranslateResult) error {
+	if len(datas) == 0 {
+		return fmt.Errorf("no data available")
+	}
+
+	for _, data := range datas {
+		id, err := strconv.Atoi(data.Id)
+		if err != nil {
+			return err
+		}
+
+		query := db.Model(&model.Review{}).Where("id = ?", id).Updates(model.Review{RemarkEn: data.Text})
+
+		if err := query.Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

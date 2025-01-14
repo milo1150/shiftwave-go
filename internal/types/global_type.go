@@ -20,4 +20,4 @@ type App struct {
 	Context context.Context
 }
 
-type Object map[string]interface{}
+type AnyObject map[string]interface{}

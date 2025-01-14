@@ -14,6 +14,7 @@ type GetReviewDTO struct {
 	Remark    string         `json:"remark"`
 	Score     uint           `json:"score"`
 	Lang      mainTypes.Lang `json:"lang"`
+	RemarkEn  string         `json:"remark_en"`
 }
 
 func TransformGetReviews(reviews []model.Review, timezone *time.Location) []GetReviewDTO {
@@ -33,6 +34,7 @@ func TransformGetReview(model model.Review, timezone *time.Location) (GetReviewD
 		Remark:    model.Remark,
 		Score:     model.Score,
 		Lang:      model.Lang,
+		RemarkEn:  model.RemarkEn,
 	}
 	return transformed, nil
 }

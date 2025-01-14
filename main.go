@@ -42,8 +42,8 @@ func main() {
 	baseHandler.SetupRoutes(e, app)
 	v1.SetupRoutes(e, app)
 
-	// Cronjob
-	scheduler.OpenAITranslateScheduler(app)
+	// Cronjob - Translate MY to EN
+	scheduler.InitOpenAiTranslateScheduler(app)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
