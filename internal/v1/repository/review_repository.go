@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"gorm.io/gorm"
 )
 
@@ -247,15 +246,13 @@ func RetrieveReviewsByLang(db *gorm.DB, loc time.Location, lang types.Lang, dura
 	currentTime := time.Now().In(location)
 	startTime := currentTime.Add(duration)
 
-	query := db.Debug().Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, currentTime, lang).
+	query := db.Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, currentTime, lang).
 		Where("remark_en = ''").
 		Order("id DESC")
 
 	if err := query.Find(reviews).Error; err != nil {
 		return nil, fmt.Errorf("error: %v", err)
 	}
-
-	spew.Dump(reviews)
 
 	return reviews, nil
 }
