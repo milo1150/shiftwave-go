@@ -247,6 +247,7 @@ func RetrieveReviewsByLang(db *gorm.DB, loc time.Location, lang types.Lang, dura
 	startTime := currentTime.Add(duration)
 
 	query := db.Where("created_at BETWEEN ? AND ? AND lang = ?", startTime, currentTime, lang).
+		Where("remark <> ''").
 		Where("remark_en = ''").
 		Order("id DESC")
 
