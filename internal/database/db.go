@@ -9,6 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
+func branchMigrate(db *gorm.DB) {
+	// Drop active column and use is_active column instead.
+	if db.Migrator().HasColumn(&model.Branch{}, "active") {
+		err := db.Migrator().DropColumn(&model.Branch{}, "active")
+		if err != nil {
+			log.Fatalf("Failed to drop Active column in Branch table")
+		}
+	}
+}
+
 func InitDatabase() *gorm.DB {
 	// Define the correct PostgreSQL connection string
 	dsn := "host=postgres user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=UTC"
@@ -29,6 +39,9 @@ func InitDatabase() *gorm.DB {
 	if err != nil {
 		log.Fatalf("Failed to update default lang column in Reviews table")
 	}
+
+	// Manual migrate branch model
+	branchMigrate(db)
 
 	// Ping the database to verify the connection
 	if err := sqlDB.Ping(); err != nil {

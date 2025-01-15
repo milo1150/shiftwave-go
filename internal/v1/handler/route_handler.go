@@ -24,4 +24,19 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 		return GetReviewHandler(c, app)
 	})
 
+	// TODO: permission
+	e.POST("/v1/branch", func(c echo.Context) error {
+		return CreateBranchHandler(c, app.DB)
+	})
+
+	// TODO: permission
+	e.GET("/v1/branches", func(c echo.Context) error {
+		return GetBranchesHandler(c, app.DB)
+	})
+
+	// TODO: permission
+	e.PATCH("/v1/branch/:id", func(c echo.Context) error {
+		return UpdateBranchHandler(c, app.DB)
+	})
+
 }
