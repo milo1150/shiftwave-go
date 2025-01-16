@@ -9,12 +9,22 @@ import (
 	"gorm.io/gorm"
 )
 
-func branchMigrate(db *gorm.DB) {
+func migrateBranchTable(db *gorm.DB) {
 	// Drop active column and use is_active column instead.
 	if db.Migrator().HasColumn(&model.Branch{}, "active") {
 		err := db.Migrator().DropColumn(&model.Branch{}, "active")
 		if err != nil {
 			log.Fatalf("Failed to drop Active column in Branch table")
+		}
+	}
+}
+
+func migrateReviewTable(db *gorm.DB) {
+	if db.Migrator().HasColumn(&model.Review{}, "lang") {
+		// Validate lang column in Reviews table
+		err := db.Exec("UPDATE reviews SET lang = 'EN' WHERE lang IS NULL").Error
+		if err != nil {
+			log.Fatalf("Failed to update default lang column in Reviews table")
 		}
 	}
 }
@@ -34,14 +44,9 @@ func InitDatabase() *gorm.DB {
 		log.Fatalf("Failed to get database instance: %v", err)
 	}
 
-	// Validate lang column in Reviews table
-	err = db.Exec("UPDATE reviews SET lang = 'EN' WHERE lang IS NULL").Error
-	if err != nil {
-		log.Fatalf("Failed to update default lang column in Reviews table")
-	}
-
 	// Manual migrate branch model
-	branchMigrate(db)
+	migrateReviewTable(db)
+	migrateBranchTable(db)
 
 	// Ping the database to verify the connection
 	if err := sqlDB.Ping(); err != nil {
