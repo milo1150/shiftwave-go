@@ -26,7 +26,8 @@ func GetBranches(db *gorm.DB) (*[]model.Branch, error) {
 func UpdateBranch(db *gorm.DB, id int, payload *v1types.UpdateBranchPayload) error {
 	result := db.Model(&model.Branch{}).
 		Where("id = ?", id).
-		Updates(&model.Branch{IsActive: payload.IsActive, Name: payload.BranchName})
+		Update("is_active", payload.IsActive).           // non-zero value
+		Updates(&model.Branch{Name: payload.BranchName}) // non-zero value
 
 	if result.Error != nil {
 		return result.Error
