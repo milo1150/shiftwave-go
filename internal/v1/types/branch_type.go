@@ -1,10 +1,10 @@
 package types
 
-type CreateBranch struct {
+type CreateBranchPayload struct {
 	BranchName string `json:"branch_name" validate:"required,alphanum"`
 }
 
-type UpdateBranch struct {
+type UpdateBranchPayload struct {
 	BranchName string `json:"branch_name" validate:"omitempty,alphanum"`
 	IsActive   bool   `json:"is_active" validate:"boolean"`
 }

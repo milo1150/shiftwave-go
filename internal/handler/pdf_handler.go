@@ -11,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// TODO: pass App for using ENV value
 func GenerateQRCodeHandler(c echo.Context) error {
 	q := &types.GeneratePdfParams{}
 	if err := c.Bind(q); err != nil {

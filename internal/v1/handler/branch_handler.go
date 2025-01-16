@@ -9,14 +9,13 @@ import (
 	v1types "shiftwave-go/internal/v1/types"
 	"strconv"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
 func CreateBranchHandler(c echo.Context, db *gorm.DB) error {
-	payload := &v1types.CreateBranch{}
+	payload := &v1types.CreateBranchPayload{}
 	if err := c.Bind(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid payload")
 	}
@@ -54,7 +53,7 @@ func UpdateBranchHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "Invalid param")
 	}
 
-	payload := &v1types.UpdateBranch{}
+	payload := &v1types.UpdateBranchPayload{}
 	if err := c.Bind(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid payload")
 	}
@@ -65,8 +64,6 @@ func UpdateBranchHandler(c echo.Context, db *gorm.DB) error {
 		errorMessagees := utils.ExtractErrorMessages(validationErrors)
 		return c.JSON(http.StatusBadRequest, errorMessagees)
 	}
-
-	spew.Dump(payload)
 
 	if err = v1repo.UpdateBranch(db, id, payload); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("%v, Unable to Update Branch", err)})
