@@ -19,6 +19,7 @@ const PROVIDE_LANG = "Burmese"
 const TARGET_LANG = "English"
 
 func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.UserMessage, error) {
+	// Generate Assistant message
 	assistantMessage := &v1types.AssistantMessage{
 		Role: "system",
 		Content: fmt.Sprintf(
@@ -26,11 +27,13 @@ func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.Us
 		),
 	}
 
+	// Generate User message
 	userMessage := &v1types.UserMessage{
 		Role:    "user",
 		Content: []v1types.TargetTranslateResponse{},
 	}
 
+	// Query review list
 	reviews, err := v1repo.RetrieveReviewsByLang(app.DB, *app.ENV.LocalTimezone, types.LangMY, -10*time.Hour)
 	if err != nil {
 		return nil, nil, err
@@ -41,6 +44,7 @@ func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.Us
 		return nil, nil, fmt.Errorf("no need execution")
 	}
 
+	// Update user message content
 	for _, review := range *reviews {
 		idString := strconv.FormatUint(uint64(review.ID), 10)
 		v := v1types.TargetTranslateResponse{
@@ -126,7 +130,7 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	log.Println("translateAndUpdateMyanmarReviews Done !!!")
 }
 
-func InitOpenAiTranslateScheduler(app *types.App) {
+func InitializeOpenAiTranslateScheduler(app *types.App) {
 	// Create a scheduler
 	s, err := gocron.NewScheduler()
 	if err != nil {
