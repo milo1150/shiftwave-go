@@ -8,7 +8,6 @@ import (
 	v1dto "shiftwave-go/internal/v1/dto"
 
 	"github.com/brianvoe/gofakeit/v7"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
@@ -43,8 +42,6 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 		errorMessagees := utils.ExtractErrorMessages(validationErrors)
 		return c.JSON(http.StatusBadRequest, errorMessagees)
 	}
-
-	spew.Dump(q)
 
 	// Check is Branch existed
 	if err := app.DB.First(&model.Branch{Model: gorm.Model{ID: q.BranchId}}).Error; err != nil {

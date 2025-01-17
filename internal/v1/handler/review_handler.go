@@ -1,14 +1,20 @@
 package handler
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	v1repository "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
 	"strconv"
 
+	"os"
+
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -86,4 +92,63 @@ func GetAverageRatingHandler(c echo.Context, app *types.App) error {
 	}
 
 	return c.JSON(http.StatusOK, result)
+}
+
+var (
+	upgrader = websocket.Upgrader{}
+)
+
+func ReviewsWs(c echo.Context, app *types.App) error {
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		return err
+	}
+	defer ws.Close()
+
+	done := make(chan bool)
+
+	// Routine for receiving signal from Review table if got any update or create
+	// and close routine when ws connection dropped.
+	go func() {
+		for {
+			select {
+			case msg := <-model.ReviewChannel:
+				fmt.Fprintln(os.Stdout, "WS receive message - ", msg)
+			case <-done:
+				return
+			}
+		}
+	}()
+
+	for {
+		// Write a message to the client
+		err := ws.WriteMessage(websocket.TextMessage, []byte("Hello, Client!"))
+		if err != nil {
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+				log.Println("WebSocket connection closed")
+				close(done)
+				break
+			}
+			c.Logger().Error("Error writing to WebSocket:", err)
+			close(done)
+			break
+		}
+
+		// Read a message from the client
+		_, msg, err := ws.ReadMessage()
+		if err != nil {
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+				log.Println("WebSocket connection closed")
+				close(done)
+				break
+			}
+			c.Logger().Error("Error reading from WebSocket:", err)
+			close(done)
+			break
+		}
+
+		fmt.Printf("Received message: %s\n", msg)
+	}
+
+	return nil
 }

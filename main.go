@@ -30,7 +30,12 @@ func main() {
 	e := echo.New()
 
 	// Initialize state
-	app := &types.App{DB: db, ENV: env, RDB: rdb, Context: ctx}
+	app := &types.App{
+		DB:      db,
+		ENV:     env,
+		RDB:     rdb,
+		Context: ctx,
+	}
 
 	// Load json data and mapping to database
 	setup.MasterDataLoader(app.DB)

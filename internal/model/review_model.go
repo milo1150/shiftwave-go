@@ -2,9 +2,14 @@ package model
 
 import (
 	"errors"
+	"log"
 	"shiftwave-go/internal/types"
 
 	"gorm.io/gorm"
+)
+
+var (
+	ReviewChannel = make(chan string, 100)
 )
 
 type Review struct {
@@ -23,5 +28,25 @@ func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
 		return errors.New("BeforeCreate Review: invalid Lang value")
 	}
 
+	return nil
+}
+
+func (r *Review) AfterCreate(tx *gorm.DB) error {
+	select {
+	// Attempt to send message without blocking when buffer is full
+	case ReviewChannel <- "AfterCreate Review":
+	default:
+		log.Println("Channel is full")
+	}
+	return nil
+}
+
+func (r *Review) AfterUpdate(tx *gorm.DB) error {
+	select {
+	// Attempt to send message without blocking when buffer is full
+	case ReviewChannel <- "AfterUpdate Review":
+	default:
+		log.Println("Channel is full")
+	}
 	return nil
 }
