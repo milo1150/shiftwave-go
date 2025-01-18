@@ -39,7 +39,11 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 		return UpdateBranchHandler(c, app.DB)
 	})
 
-	e.GET("/v1/reviews/ws", func(c echo.Context) error {
-		return ReviewsWs(c, app)
+	e.GET("/v1/reviews/s-ws", func(c echo.Context) error {
+		return ReviewWsSingleConnection(c, app)
+	})
+
+	e.GET("/v1/reviews/m-ws", func(c echo.Context) error {
+		return ReviewWsMultipleConnection(c, app)
 	})
 }
