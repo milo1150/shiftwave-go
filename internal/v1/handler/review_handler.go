@@ -11,8 +11,6 @@ import (
 	v1types "shiftwave-go/internal/v1/types"
 	"strconv"
 
-	"os"
-
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -112,8 +110,10 @@ func ReviewsWs(c echo.Context, app *types.App) error {
 	go func() {
 		for {
 			select {
-			case msg := <-model.ReviewChannel:
-				fmt.Fprintln(os.Stdout, "WS receive message - ", msg)
+			case <-model.ReviewChannel:
+				ws.WriteJSON(map[string]interface{}{
+					"update": true,
+				})
 			case <-done:
 				return
 			}
@@ -138,7 +138,7 @@ func ReviewsWs(c echo.Context, app *types.App) error {
 		_, msg, err := ws.ReadMessage()
 		if err != nil {
 			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
-				log.Println("WebSocket connection closed")
+				log.Printf("WebSocket connection closed: %v \n.", err)
 				close(done)
 				break
 			}

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ReviewChannel = make(chan string, 100)
+	ReviewChannel = make(chan string)
 )
 
 type Review struct {
