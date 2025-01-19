@@ -26,10 +26,11 @@ func EnvLoader() types.Env {
 
 	// OpenAI
 	openAI := os.Getenv("OPENAI_API_KEY")
-	if err != nil {
-		log.Fatalf("Error loading OpenAI API KEY: %v", err)
-	}
 	env.OpenAI = openAI
+
+	// JWT
+	jwt := os.Getenv("JWT")
+	env.JWT = jwt
 
 	return env
 }

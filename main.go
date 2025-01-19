@@ -41,7 +41,7 @@ func main() {
 	setup.MasterDataLoader(app.DB)
 
 	// Middlewares
-	middleware.SetupMiddlewares(e, ctx)
+	middleware.SetupMiddlewares(e, ctx, app.ENV)
 
 	// Routes
 	baseHandler.SetupRoutes(e, app)

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
@@ -20,6 +21,10 @@ func SetupRoutes(e *echo.Echo, app *types.App) {
 
 	e.GET("/generate-random-reviews", func(c echo.Context) error {
 		return GenerateRandomReviews(c, app)
+	})
+
+	e.POST("/login", func(c echo.Context) error {
+		return middleware.LoginHandler(c, app)
 	})
 }
 

@@ -11,6 +11,7 @@ import (
 type Env struct {
 	LocalTimezone *time.Location
 	OpenAI        string
+	JWT           string
 }
 
 type App struct {
