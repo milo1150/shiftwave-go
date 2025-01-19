@@ -1,6 +1,11 @@
 package types
 
 type LoginPayload struct {
-	User     string `json:"u" validate:"required"`
+	Username string `json:"u" validate:"required"`
+	Password string `json:"pwd" validate:"required"`
+}
+
+type CreateUserPayload struct {
+	Username string `json:"u" validate:"required"`
 	Password string `json:"pwd" validate:"required"`
 }

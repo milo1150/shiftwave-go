@@ -43,6 +43,10 @@ your-service/
 │   └── yourservice/
 │       └── main.go
 ├── internal/
+│   ├── auth/
+│   │   ├── auth.go          // General authentication logic
+│   │   ├── password.go      // Specific password-related functions
+│   │   └── jwt.go           // JWT-related logic
 │   ├── handler/
 │   │   ├── root_handler.go
 │   │   └── review_handler.go

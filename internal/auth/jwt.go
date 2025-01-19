@@ -1,14 +1,10 @@
-package middleware
+package auth
 
 import (
-	"net/http"
 	"time"
 
 	"shiftwave-go/internal/types"
-	"shiftwave-go/internal/utils"
 
-	"github.com/davecgh/go-spew/spew"
-	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -17,12 +13,12 @@ import (
 // jwtCustomClaims are custom claims extending default ones.
 // See https://github.com/golang-jwt/jwt for more examples
 type jwtCustomClaims struct {
-	Name                 string `json:"name"`
-	Admin                bool   `json:"admin"`
-	jwt.RegisteredClaims        // struct embedding (in ts call extend interface)
+	Name string `json:"name"`
+	// Admin                bool   `json:"admin"` // TODO: permission ?
+	jwt.RegisteredClaims // struct embedding (in ts call extend interface)
 }
 
-func ConfigJWT(e *echo.Echo, secret string) echo.MiddlewareFunc {
+func configJWT(secret string) echo.MiddlewareFunc {
 	// WithConfig returns a JSON Web Token (JWT) auth middleware or panics if configuration is invalid.
 	//
 	// For valid token, it sets the user in context and calls next handler.
@@ -58,76 +54,43 @@ func ConfigJWT(e *echo.Echo, secret string) echo.MiddlewareFunc {
 	})
 }
 
-func JWT(e *echo.Echo, env types.Env) echo.MiddlewareFunc {
+func Jwt(e *echo.Echo, env types.Env) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Run JWT Extraction.
 			// Call nested function [(next)(c)] until get an error.
-			jwtMiddleware := ConfigJWT(e, env.JWT)
+			jwtMiddleware := configJWT(env.JWT)
 			if err := jwtMiddleware(next)(c); err != nil {
 				return err
 			}
 
-			user := c.Get("user").(*jwt.Token)
-			spew.Dump(user)
+			// Save for debug
+			// user := c.Get("user").(*jwt.Token)
+			// spew.Dump(user)
 
 			return next(c)
 		}
 	}
 }
 
-func GenerateToken(secret string, name string, admin bool) (string, error) {
+// Generate encoded jwt token for client
+func GenerateToken(secret string, name string) (string, error) {
 	// Set custom claims
 	claims := &jwtCustomClaims{
-		Name:  name,
-		Admin: admin,
+		Name: name,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(10 * time.Second)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(20 * time.Second)),
 		},
 	}
 
 	// Create token with claims
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token
-	t, err := token.SignedString([]byte(secret))
+	token, err := jwtToken.SignedString([]byte(secret))
 	if err != nil {
 		return "", err
 	}
 
-	return t, nil
-}
-
-func LoginHandler(c echo.Context, app *types.App) error {
-	payload := &types.LoginPayload{}
-	if err := c.Bind(payload); err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid payload")
-	}
-
-	// Validate login payload
-	v := validator.New()
-	if err := v.Struct(payload); err != nil {
-		validationErrors := err.(validator.ValidationErrors)
-		errorMessages := utils.ExtractErrorMessages(validationErrors)
-		return c.JSON(http.StatusBadRequest, errorMessages)
-	}
-
-	// TODO: Query -> Find user in db
-
-	// Generate encoded token
-	t, err := GenerateToken(app.ENV.JWT, "Min", true)
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, map[string]string{"token": t})
-}
-
-func GenerateUser(app *types.App) error {
-	return nil
-}
-
-// TODO:
-func HashPassword(password string) (string, error) {
-	return "", nil
+	return token, nil
 }

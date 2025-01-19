@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"shiftwave-go/internal/auth"
 	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 
@@ -10,7 +11,7 @@ import (
 func SetupRoutes(e *echo.Echo, app *types.App) {
 	e.GET("/v1/reviews", func(c echo.Context) error {
 		return GetReviewsHandler(c, app)
-	}, middleware.JWT(e, app.ENV))
+	}, auth.Jwt(e, app.ENV))
 
 	e.GET("/v1/reviews/average-rating", func(c echo.Context) error {
 		return GetAverageRatingHandler(c, app)
