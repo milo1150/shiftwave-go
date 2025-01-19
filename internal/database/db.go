@@ -29,6 +29,15 @@ func migrateReviewTable(db *gorm.DB) {
 	}
 }
 
+func migrateUserTable(db *gorm.DB) {
+	if db.Migrator().HasColumn(&model.User{}, "active_statue") {
+		err := db.Migrator().DropColumn(&model.User{}, "active_statue")
+		if err != nil {
+			log.Fatalf("Failed to drop column active_statue: %v.", err)
+		}
+	}
+}
+
 func InitDatabase() *gorm.DB {
 	// Define the correct PostgreSQL connection string
 	dsn := "host=postgres user=postgres password=postgres dbname=mydb port=5432 sslmode=disable TimeZone=UTC"
@@ -47,6 +56,7 @@ func InitDatabase() *gorm.DB {
 	// Manual migrate branch model
 	migrateReviewTable(db)
 	migrateBranchTable(db)
+	migrateUserTable(db)
 
 	// Ping the database to verify the connection
 	if err := sqlDB.Ping(); err != nil {
