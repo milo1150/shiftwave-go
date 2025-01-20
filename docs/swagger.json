@@ -1,0 +1,58 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample API documentation for Echo with Swagger.",
+        "title": "Shiftwave API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/v1",
+    "paths": {
+        "/user": {
+            "post": {
+                "description": "API endpoint to create a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "Payload Create User",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.CreateUserPayload"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "types.CreateUserPayload": {
+            "type": "object",
+            "required": [
+                "pwd",
+                "u"
+            ],
+            "properties": {
+                "pwd": {
+                    "type": "string",
+                    "example": "johndoe"
+                },
+                "u": {
+                    "type": "string",
+                    "example": "johndoe"
+                }
+            }
+        }
+    }
+}

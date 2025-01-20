@@ -1,0 +1,39 @@
+basePath: /v1
+definitions:
+  types.CreateUserPayload:
+    properties:
+      pwd:
+        example: johndoe
+        type: string
+      u:
+        example: johndoe
+        type: string
+    required:
+    - pwd
+    - u
+    type: object
+info:
+  contact: {}
+  description: This is a sample API documentation for Echo with Swagger.
+  title: Shiftwave API
+  version: "1.0"
+paths:
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: API endpoint to create a new user
+      parameters:
+      - description: Payload Create User
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/types.CreateUserPayload'
+      produces:
+      - application/json
+      responses: {}
+      summary: Create a new user
+      tags:
+      - Users
+swagger: "2.0"

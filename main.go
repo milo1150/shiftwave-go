@@ -10,9 +10,16 @@ import (
 	"shiftwave-go/internal/types"
 	v1 "shiftwave-go/internal/v1/handler"
 
+	_ "shiftwave-go/docs" // Import Swagger docs package
+
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+// @title Shiftwave API
+// @version 1.0
+// @description This is a sample API documentation for Echo with Swagger.
+// @BasePath /v1
 func main() {
 	// Initialize the database
 	db := database.InitDatabase()
@@ -42,6 +49,9 @@ func main() {
 
 	// Middlewares
 	middleware.SetupMiddlewares(e, ctx, app.ENV)
+
+	// Swagger endpoint
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Routes
 	baseHandler.SetupRoutes(e, app)

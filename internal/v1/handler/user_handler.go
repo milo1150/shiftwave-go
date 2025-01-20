@@ -47,6 +47,14 @@ func LoginHandler(c echo.Context, app *types.App) error {
 	return c.JSON(http.StatusOK, map[string]string{"token": token})
 }
 
+// CreateUser creates a new user
+// @Summary Create a new user
+// @Description API endpoint to create a new user
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param payload body types.CreateUserPayload true "Payload Create User"
+// @Router /user [post]
 func CreateUser(c echo.Context, app *types.App) error {
 	// Extract json payload
 	payload := &types.CreateUserPayload{}
@@ -65,10 +73,10 @@ func CreateUser(c echo.Context, app *types.App) error {
 	// Handle create user and error
 	err := v1repo.CreateUser(app.DB, payload)
 	if pgErr, ok := err.(*pgconn.PgError); ok { // see type assertion in go spec
-		return c.JSON(http.StatusInternalServerError, pgErr.Detail)
+		return c.JSON(http.StatusConflict, pgErr.Detail)
 	}
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
+		return c.JSON(http.StatusConflict, err.Error())
 	}
 
 	return c.JSON(http.StatusCreated, http.StatusCreated)
