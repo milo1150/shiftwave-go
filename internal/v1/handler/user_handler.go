@@ -30,16 +30,17 @@ func LoginHandler(c echo.Context, app *types.App) error {
 	// Find user in db
 	user, err := v1repo.FindUser(app.DB, payload.Username)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusBadRequest, "Invalid username or password")
 	}
 
+	// Validate password
 	result := auth.ComparePassword(user.Password, payload.Password)
 	if !result {
-		return c.JSON(http.StatusUnauthorized, "WTF man")
+		return c.JSON(http.StatusBadRequest, "Invalid username or password")
 	}
 
 	// Generate jwt token
-	token, err := auth.GenerateToken(app.ENV.JWT, user.Username)
+	token, err := auth.GenerateToken(app.ENV.JWT, user.Username, int(user.ID), user.Role, user.ActiveStatus)
 	if err != nil {
 		return err
 	}

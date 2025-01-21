@@ -26,11 +26,24 @@ func EnvLoader() types.Env {
 
 	// OpenAI
 	openAI := os.Getenv("OPENAI_API_KEY")
+	if openAI == "" {
+		log.Fatalf("openAI token should be not empty")
+	}
 	env.OpenAI = openAI
 
 	// JWT
 	jwt := os.Getenv("JWT")
+	if jwt == "" {
+		log.Fatalf("jwt secret should be not empty")
+	}
 	env.JWT = jwt
+
+	// Admin pwd
+	adminPassword := os.Getenv("ADMIN_PASSWORD")
+	if adminPassword == "" {
+		log.Fatalf("admin password should be not empty")
+	}
+	env.AdminPassword = adminPassword
 
 	return env
 }

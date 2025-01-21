@@ -94,8 +94,10 @@ func GetAverageRatingHandler(c echo.Context, app *types.App) error {
 
 // Single WS connection
 func ReviewWsSingleConnection(c echo.Context, app *types.App) error {
+	log.Println("check in")
 	ws, err := middleware.Upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
+		log.Println("Error upgrade ws:", err) // TODO: use zap
 		return err
 	}
 	defer ws.Close()

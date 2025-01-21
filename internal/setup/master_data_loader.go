@@ -2,9 +2,11 @@ package setup
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"shiftwave-go/internal/auth"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 
@@ -64,7 +66,7 @@ func insertBranchesIntoDB(db *gorm.DB, branchJsons []types.BranchMasterData) {
 	}
 }
 
-func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData) {
+func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData, adminPassword string) {
 	users := &[]model.User{}
 	if err := db.Find(users).Error; err != nil {
 		log.Fatalf("Find users error: %s", err)
@@ -77,7 +79,16 @@ func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData) {
 
 	for _, userJson := range userJsons {
 		if _, existed := check[userJson.Username]; !existed {
-			if err := db.Create(&model.User{Username: userJson.Username}).Error; err != nil {
+			// Hash adminpassword before use
+			hashPassword, err := auth.HashedPassword(adminPassword)
+			if err != nil {
+				log.Fatalf("Failed to hash admin password")
+			}
+
+			fmt.Println(adminPassword, hashPassword)
+
+			result := db.Create(&model.User{Username: userJson.Username, Role: userJson.Role, Password: hashPassword})
+			if err := result.Error; err != nil {
 				log.Fatalf("Failed to inserted %v into User table: %v", userJson.Username, err)
 			} else {
 				log.Printf("Inserted %v into User table.", userJson.Username)
@@ -86,12 +97,12 @@ func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData) {
 	}
 }
 
-func MasterDataLoader(db *gorm.DB) {
+func MasterDataLoader(app *types.App) {
 	masterDataByte := loadMasterDataJsonFile()
 
 	masterDataJson := getMasterDataJson(masterDataByte)
 
-	insertBranchesIntoDB(db, masterDataJson.Branches)
+	insertBranchesIntoDB(app.DB, masterDataJson.Branches)
 
-	insertUserIntoDB(db, masterDataJson.Users)
+	insertUserIntoDB(app.DB, masterDataJson.Users, app.ENV.AdminPassword)
 }

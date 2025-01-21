@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -13,8 +15,15 @@ var (
 			allowOrigins := []string{"http://localhost:4321"} // TODO: mapping prd domain
 			header := r.Header.Get("Origin")
 
-			for _, o := range allowOrigins {
-				if header == o {
+			// Allow requests without the Origin header (e.g., from Postman) if env is development
+			env := os.Getenv("APP_ENV")
+			if header == "" && env == "development" {
+				log.Println("Allowing request from Postman (no Origin header).")
+				return true
+			}
+
+			for _, origin := range allowOrigins {
+				if header == origin {
 					return true
 				}
 			}

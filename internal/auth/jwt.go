@@ -12,13 +12,15 @@ import (
 
 // jwtCustomClaims are custom claims extending default ones.
 // See https://github.com/golang-jwt/jwt for more examples
-type jwtCustomClaims struct {
-	Name string `json:"name"`
-	// Admin                bool   `json:"admin"` // TODO: permission ?
-	jwt.RegisteredClaims // struct embedding (in ts call extend interface)
+type JwtCustomClaims struct {
+	Name                 string `json:"name"`
+	ID                   int    `json:"id"`
+	ActiveStatus         bool   `json:"active_status"`
+	Role                 string `json:"role"`
+	jwt.RegisteredClaims        // struct embedding (in ts call extend interface)
 }
 
-func configJWT(secret string) echo.MiddlewareFunc {
+func ConfigJWT(secret string) echo.MiddlewareFunc {
 	// WithConfig returns a JSON Web Token (JWT) auth middleware or panics if configuration is invalid.
 	//
 	// For valid token, it sets the user in context and calls next handler.
@@ -49,7 +51,7 @@ func configJWT(secret string) echo.MiddlewareFunc {
 		//  }
 		// })
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(jwtCustomClaims)
+			return new(JwtCustomClaims)
 		},
 	})
 }
@@ -59,7 +61,7 @@ func Jwt(e *echo.Echo, env types.Env) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			// Run JWT Extraction.
 			// Call nested function [(next)(c)] until get an error.
-			jwtMiddleware := configJWT(env.JWT)
+			jwtMiddleware := ConfigJWT(env.JWT)
 			if err := jwtMiddleware(next)(c); err != nil {
 				return err
 			}
@@ -74,12 +76,15 @@ func Jwt(e *echo.Echo, env types.Env) echo.MiddlewareFunc {
 }
 
 // Generate encoded jwt token for client
-func GenerateToken(secret string, name string) (string, error) {
+func GenerateToken(secret string, name string, id int, role string, status bool) (string, error) {
 	// Set custom claims
-	claims := &jwtCustomClaims{
-		Name: name,
+	claims := &JwtCustomClaims{
+		Name:         name,
+		ID:           id,
+		Role:         role,
+		ActiveStatus: status,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(20 * time.Second)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	}
 

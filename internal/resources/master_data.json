@@ -6,7 +6,8 @@
 	],
 	"users": [
 		{
-			"username": "assmin"
+			"username": "assmin",
+			"role": "admin"
 		}
 	]
 }

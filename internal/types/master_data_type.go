@@ -12,4 +12,5 @@ type BranchMasterData struct {
 
 type UserMasterData struct {
 	Username string `json:"username" validate:"required"`
+	Role     string `json:"role"`
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"shiftwave-go/internal/auth"
 	"shiftwave-go/internal/database"
 	baseHandler "shiftwave-go/internal/handler"
 	"shiftwave-go/internal/middleware"
@@ -13,7 +14,6 @@ import (
 	_ "shiftwave-go/docs" // Import Swagger docs package
 
 	"github.com/labstack/echo/v4"
-	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 // @title Shiftwave API
@@ -26,6 +26,9 @@ func main() {
 
 	// Initialize Redis client
 	rdb := database.NewRedisClient()
+
+	// Initialize Permission (Casbin)
+	enforcer := auth.InitPermission(db)
 
 	// Load and construct env
 	env := setup.EnvLoader()
@@ -45,17 +48,14 @@ func main() {
 	}
 
 	// Load json data and mapping to database
-	setup.MasterDataLoader(app.DB)
+	setup.MasterDataLoader(app)
 
 	// Middlewares
-	middleware.SetupMiddlewares(e, ctx, app.ENV)
-
-	// Swagger endpoint
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
+	middleware.SetupMiddlewares(e, app.ENV)
 
 	// Routes
 	baseHandler.SetupRoutes(e, app)
-	v1.SetupRoutes(e, app)
+	v1.SetupRoutes(e, app, enforcer)
 
 	// Cronjob - Translate MY to EN
 	scheduler.InitializeOpenAiTranslateScheduler(app)
