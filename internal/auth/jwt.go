@@ -61,16 +61,11 @@ func Jwt(e *echo.Echo, env types.Env) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			// Run JWT Extraction.
 			// Call nested function [(next)(c)] until get an error.
-			jwtMiddleware := ConfigJWT(env.JWT)
-			if err := jwtMiddleware(next)(c); err != nil {
+			if err := ConfigJWT(env.JWT)(next)(c); err != nil {
 				return err
 			}
 
-			// Save for debug
-			// user := c.Get("user").(*jwt.Token)
-			// spew.Dump(user)
-
-			return next(c)
+			return nil
 		}
 	}
 }
