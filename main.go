@@ -9,7 +9,7 @@ import (
 	"shiftwave-go/internal/scheduler"
 	"shiftwave-go/internal/setup"
 	"shiftwave-go/internal/types"
-	v1 "shiftwave-go/internal/v1/handler"
+	v1handler "shiftwave-go/internal/v1/handler"
 
 	_ "shiftwave-go/docs" // Import Swagger docs package
 
@@ -53,9 +53,11 @@ func main() {
 	// Middlewares
 	middleware.SetupMiddlewares(e, app.ENV)
 
-	// Routes
+	// Base Route
 	baseHandler.SetupRoutes(e, app)
-	v1.SetupRoutes(e, app, enforcer)
+	// V1 Route
+	routeV1 := v1handler.RouteV1(v1handler.RouteV1{Echo: e, App: app, Enforcer: enforcer})
+	routeV1.SetupRoutes()
 
 	// Cronjob - Translate MY to EN
 	scheduler.InitializeOpenAiTranslateScheduler(app)

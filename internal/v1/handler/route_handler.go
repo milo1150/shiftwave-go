@@ -9,17 +9,42 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// TODO: refactor
-func SetupRoutes(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
-	e.POST("/v1/login", func(c echo.Context) error {
+type RouteV1 struct {
+	Echo     *echo.Echo
+	App      *types.App
+	Enforcer *casbin.Enforcer
+}
+
+func (r *RouteV1) SetupRoutes() {
+	// /v1/user
+	userRoute(r.Echo, r.App)
+
+	// /v1/reviews
+	reviewsRoute(r.Echo, r.App, r.Enforcer)
+
+	// /v1/review
+	reviewRoute(r.Echo, r.App)
+
+	// /v1/branch
+	branchRoute(r.Echo, r.App)
+
+	// /v1/branches
+	branchesRoute(r.Echo, r.App)
+}
+
+func userRoute(e *echo.Echo, app *types.App) {
+	userGroup := e.Group("/v1/user")
+
+	userGroup.POST("/login", func(c echo.Context) error {
 		return LoginHandler(c, app)
 	})
 
-	e.POST("/v1/user", func(c echo.Context) error {
+	userGroup.POST("/create-user", func(c echo.Context) error {
 		return CreateUser(c, app)
 	})
+}
 
-	// Group: /v1/reviews
+func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	reviewsGroup := e.Group("/v1/reviews", auth.Jwt(e, app.ENV), middleware.RoutePermission(app.ENV.JWT, enforcer))
 
 	reviewsGroup.GET("", func(c echo.Context) error {
@@ -34,11 +59,13 @@ func SetupRoutes(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	e.GET("/v1/reviews/s-ws", func(c echo.Context) error {
 		return ReviewWsSingleConnection(c, app)
 	})
+
 	e.GET("/v1/reviews/m-ws", func(c echo.Context) error {
 		return ReviewWsMultipleConnection(c, app)
 	})
+}
 
-	// Group: /v1/review
+func reviewRoute(e *echo.Echo, app *types.App) {
 	reviewGroup := e.Group("/v1/review")
 
 	reviewGroup.POST("", func(c echo.Context) error {
@@ -48,8 +75,9 @@ func SetupRoutes(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	reviewGroup.GET("/:id", func(c echo.Context) error {
 		return GetReviewHandler(c, app)
 	})
+}
 
-	// Group: /v1/branch
+func branchRoute(e *echo.Echo, app *types.App) {
 	branchGroup := e.Group("/v1/branch")
 
 	branchGroup.POST("", func(c echo.Context) error {
@@ -59,8 +87,9 @@ func SetupRoutes(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	branchGroup.PATCH("/:id", func(c echo.Context) error {
 		return UpdateBranchHandler(c, app.DB)
 	})
+}
 
-	// Group: /v1/branches
+func branchesRoute(e *echo.Echo, app *types.App) {
 	branchesGroup := e.Group("/v1/branches")
 
 	branchesGroup.GET("/v1/branches", func(c echo.Context) error {
