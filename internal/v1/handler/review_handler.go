@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -185,6 +186,7 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 					}
 					return true
 				})
+
 			case <-done:
 				return
 			}
@@ -226,4 +228,35 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 	middleware.ActiveChannels.Delete(ws)
 
 	return nil
+}
+
+func ReviewSse(c echo.Context) error {
+	w := c.Response()
+	w.Header().Set(echo.HeaderContentType, "text/event-stream")
+	w.Header().Set(echo.HeaderCacheControl, "no-cache")
+	w.Header().Set(echo.HeaderConnection, "keep-alive")
+
+	for {
+		select {
+		case <-middleware.ReviewChannel:
+			res := map[string]interface{}{"update": true}
+
+			// Parse payload to []byte
+			parseRes, _ := json.Marshal(res)
+			event := types.Event{
+				Data: parseRes,
+			}
+
+			// Handle error
+			if err := event.MarshalTo(w); err != nil {
+				return err
+			}
+
+			// Send response to client
+			w.Flush()
+
+		case <-c.Request().Context().Done():
+			return nil
+		}
+	}
 }

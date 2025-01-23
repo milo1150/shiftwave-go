@@ -63,6 +63,11 @@ func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	e.GET("/v1/reviews/m-ws", func(c echo.Context) error {
 		return ReviewWsMultipleConnection(c, app)
 	})
+
+	// TODO: JWT auth
+	e.GET("/v1/reviews/sse", func(c echo.Context) error {
+		return ReviewSse(c)
+	})
 }
 
 func reviewRoute(e *echo.Echo, app *types.App) {
