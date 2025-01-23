@@ -21,10 +21,23 @@ func InitPermission(db *gorm.DB) *casbin.Enforcer {
 		log.Fatalf("Error load enforcer: %v", err)
 	}
 
-	// Add more Route here...
-	enforcer.AddPolicy("admin", "/v1/reviews")
+	// Add Route Guard
+	addPolicy(enforcer)
 
+	// Remove unuse policy
+	removePolicy(enforcer)
+
+	// LoadPolicy reloads the policy from database.
 	enforcer.LoadPolicy()
 
 	return enforcer
+}
+
+func addPolicy(enforcer *casbin.Enforcer) {
+	enforcer.AddPolicy("admin", "/v1/reviews")
+	enforcer.AddPolicy("admin", "/v1/reviews/average-rating")
+}
+
+func removePolicy(enforcer *casbin.Enforcer) {
+	enforcer.RemovePolicy("admin", "/v1/average-rating")
 }
