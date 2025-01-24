@@ -29,7 +29,7 @@ func (r *RouteV1) SetupRoutes() {
 	branchRoute(r.Echo, r.App)
 
 	// /v1/branches
-	branchesRoute(r.Echo, r.App)
+	branchesRoute(r.Echo, r.App, r.Enforcer)
 }
 
 func userRoute(e *echo.Echo, app *types.App) {
@@ -94,10 +94,10 @@ func branchRoute(e *echo.Echo, app *types.App) {
 	})
 }
 
-func branchesRoute(e *echo.Echo, app *types.App) {
-	branchesGroup := e.Group("/v1/branches")
+func branchesRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
+	branchesGroup := e.Group("/v1/branches", auth.Jwt(e, app.ENV), middleware.RoutePermission(app.ENV.JWT, enforcer))
 
-	branchesGroup.GET("/v1/branches", func(c echo.Context) error {
+	branchesGroup.GET("", func(c echo.Context) error {
 		return GetBranchesHandler(c, app.DB)
 	})
 }
