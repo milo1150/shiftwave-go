@@ -3,7 +3,7 @@ package model
 import (
 	"errors"
 	"log"
-	"shiftwave-go/internal/middleware"
+	"shiftwave-go/internal/connection"
 	"shiftwave-go/internal/types"
 
 	"gorm.io/gorm"
@@ -37,19 +37,32 @@ func broadcastMessage(channel chan string, msg string) {
 	}
 }
 
+// Channel - Check if has any connections before send message for prevent spam x message for first incoming connection.
 func (r *Review) AfterCreate(tx *gorm.DB) error {
-	broadcastMessage(middleware.ReviewChannelWs, "AfterCreate Review")
-	broadcastMessage(middleware.ReviewChannelSse, "AfterCreate Review")
+	_, sseIsEmpty := connection.CheckActiveSseChannel()
+	if !sseIsEmpty {
+		broadcastMessage(connection.ReviewChannelSse, "AfterCreate Review")
+	}
+
+	_, wsIsEmpty := connection.CheckActiveWsChannel()
+	if !wsIsEmpty {
+		broadcastMessage(connection.ReviewChannelWs, "AfterCreate Review")
+	}
+
 	return nil
 }
 
+// Channel - Check if has any connections before send message for prevent spam x message for first incoming connection.
 func (r *Review) AfterUpdate(tx *gorm.DB) error {
-	select {
-	// Attempt to send message without blocking when buffer is full
-	case middleware.ReviewChannelWs <- "AfterUpdate Review":
-	case middleware.ReviewChannelSse <- "AfterCreate Review":
-	default:
-		log.Println("Channel is full")
+	_, sseIsEmpty := connection.CheckActiveSseChannel()
+	if !sseIsEmpty {
+		broadcastMessage(connection.ReviewChannelSse, "AfterCreate Review")
 	}
+
+	_, wsIsEmpty := connection.CheckActiveWsChannel()
+	if !wsIsEmpty {
+		broadcastMessage(connection.ReviewChannelWs, "AfterCreate Review")
+	}
+
 	return nil
 }

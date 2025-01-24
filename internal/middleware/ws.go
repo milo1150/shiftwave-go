@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sync"
 
 	"github.com/gorilla/websocket"
 )
@@ -31,8 +30,4 @@ var (
 			return false
 		},
 	}
-	ReviewChannelWs   = make(chan string, 100)
-	ActiveWsChannels  sync.Map
-	ReviewChannelSse  = make(chan string, 100)
-	ActiveSseChannels sync.Map
 )

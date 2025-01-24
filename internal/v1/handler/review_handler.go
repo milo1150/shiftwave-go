@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"shiftwave-go/internal/connection"
 	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
@@ -110,7 +111,7 @@ func ReviewWsSingleConnection(c echo.Context, app *types.App) error {
 	go func() {
 		for {
 			select {
-			case <-middleware.ReviewChannelWs:
+			case <-connection.ReviewChannelWs:
 				ws.WriteJSON(map[string]interface{}{
 					"update": true,
 				})
@@ -164,7 +165,7 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 
 	// Store websocket connection as a pointer
 	// because WebSocket connections are generally large objects, so need to avoid unnecessary copying by passing pointers
-	middleware.ActiveWsChannels.Store(ws, nil)
+	connection.ActiveWsChannels.Store(ws, nil)
 	log.Println("New WebSocket connection established")
 
 	// Initialize channel for closing goroutine
@@ -175,9 +176,8 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 	go func() {
 		for {
 			select {
-			case <-middleware.ReviewChannelWs:
-				fmt.Println("WebSocket INCOMING message")
-				middleware.ActiveWsChannels.Range(func(key, value any) bool {
+			case <-connection.ReviewChannelWs:
+				connection.ActiveWsChannels.Range(func(key, value any) bool {
 					conn := key.(*websocket.Conn)
 
 					err := conn.WriteJSON(map[string]interface{}{
@@ -229,7 +229,7 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 	}
 
 	// Remove the WebSocket connection from the active connections map
-	middleware.ActiveWsChannels.Delete(ws)
+	connection.ActiveWsChannels.Delete(ws)
 
 	return nil
 }
@@ -240,17 +240,15 @@ func ReviewSse(c echo.Context) error {
 	w.Header().Set(echo.HeaderCacheControl, "no-cache")
 	w.Header().Set(echo.HeaderConnection, "keep-alive")
 
-	middleware.ActiveSseChannels.Store(w, nil)
+	connection.ActiveSseChannels.Store(w, nil)
 
 	done := make(chan bool)
 
 	go func() {
 		for {
 			select {
-			case <-middleware.ReviewChannelSse:
-				fmt.Println("ReviewSse INCOMING message")
-
-				middleware.ActiveSseChannels.Range(func(key, value any) bool {
+			case <-connection.ReviewChannelSse:
+				connection.ActiveSseChannels.Range(func(key, value any) bool {
 					sse := key.(*echo.Response)
 
 					// Create payload
@@ -273,7 +271,6 @@ func ReviewSse(c echo.Context) error {
 				})
 
 			case <-done:
-				fmt.Println("SSE go routine DONE")
 				return
 			}
 		}
@@ -281,8 +278,12 @@ func ReviewSse(c echo.Context) error {
 
 	// Handle SSE client lifecycle
 	<-c.Request().Context().Done()
-	log.Printf("SSE client disconnected, ip: %v", c.RealIP())
-	middleware.ActiveSseChannels.Delete(w)
+	log.Println("SSE client disconnected")
+
+	// Remove active sse connection from the active connections map
+	connection.ActiveSseChannels.Delete(w)
+
+	// Close go routine
 	close(done)
 
 	return nil
