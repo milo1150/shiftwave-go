@@ -110,7 +110,7 @@ func ReviewWsSingleConnection(c echo.Context, app *types.App) error {
 	go func() {
 		for {
 			select {
-			case <-middleware.ReviewChannel:
+			case <-middleware.ReviewChannelWs:
 				ws.WriteJSON(map[string]interface{}{
 					"update": true,
 				})
@@ -164,7 +164,7 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 
 	// Store websocket connection as a pointer
 	// because WebSocket connections are generally large objects, so need to avoid unnecessary copying by passing pointers
-	middleware.ActiveChannels.Store(ws, nil)
+	middleware.ActiveWsChannels.Store(ws, nil)
 	log.Println("New WebSocket connection established")
 
 	// Initialize channel for closing goroutine
@@ -175,15 +175,19 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 	go func() {
 		for {
 			select {
-			case <-middleware.ReviewChannel:
-				middleware.ActiveChannels.Range(func(key, value any) bool {
+			case <-middleware.ReviewChannelWs:
+				fmt.Println("WebSocket INCOMING message")
+				middleware.ActiveWsChannels.Range(func(key, value any) bool {
 					conn := key.(*websocket.Conn)
+
 					err := conn.WriteJSON(map[string]interface{}{
 						"update": true,
 					})
+
 					if err != nil {
 						log.Printf("Error sending to connection: %v", err)
 					}
+
 					return true
 				})
 
@@ -221,11 +225,11 @@ func ReviewWsMultipleConnection(c echo.Context, app *types.App) error {
 			break
 		}
 
-		fmt.Printf("Received message: %s\n", msg)
+		fmt.Printf("Received message: %s\n", msg) // TODO: use zap or remove
 	}
 
 	// Remove the WebSocket connection from the active connections map
-	middleware.ActiveChannels.Delete(ws)
+	middleware.ActiveWsChannels.Delete(ws)
 
 	return nil
 }
@@ -236,27 +240,50 @@ func ReviewSse(c echo.Context) error {
 	w.Header().Set(echo.HeaderCacheControl, "no-cache")
 	w.Header().Set(echo.HeaderConnection, "keep-alive")
 
-	for {
-		select {
-		case <-middleware.ReviewChannel:
-			res := map[string]interface{}{"update": true}
+	middleware.ActiveSseChannels.Store(w, nil)
 
-			// Parse payload to []byte
-			parseRes, _ := json.Marshal(res)
-			event := types.Event{
-				Data: parseRes,
+	done := make(chan bool)
+
+	go func() {
+		for {
+			select {
+			case <-middleware.ReviewChannelSse:
+				fmt.Println("ReviewSse INCOMING message")
+
+				middleware.ActiveSseChannels.Range(func(key, value any) bool {
+					sse := key.(*echo.Response)
+
+					// Create payload
+					res := map[string]interface{}{"update": true}
+					parseRes, _ := json.Marshal(res)
+					event := types.Event{
+						Data: parseRes,
+					}
+
+					// Handle error
+					if err := event.MarshalTo(sse); err != nil { // make sure marshalto sse not w (race condition)
+						log.Printf("Error flush: %v \n", err)
+						return false
+					}
+
+					// Flush the message
+					sse.Flush()
+
+					return true
+				})
+
+			case <-done:
+				fmt.Println("SSE go routine DONE")
+				return
 			}
-
-			// Handle error
-			if err := event.MarshalTo(w); err != nil {
-				return err
-			}
-
-			// Send response to client
-			w.Flush()
-
-		case <-c.Request().Context().Done():
-			return nil
 		}
-	}
+	}()
+
+	// Handle SSE client lifecycle
+	<-c.Request().Context().Done()
+	log.Printf("SSE client disconnected, ip: %v", c.RealIP())
+	middleware.ActiveSseChannels.Delete(w)
+	close(done)
+
+	return nil
 }

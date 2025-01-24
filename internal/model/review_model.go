@@ -28,20 +28,26 @@ func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func (r *Review) AfterCreate(tx *gorm.DB) error {
+func broadcastMessage(channel chan string, msg string) {
 	select {
 	// Attempt to send message without blocking when buffer is full
-	case middleware.ReviewChannel <- "AfterCreate Review":
+	case channel <- msg:
 	default:
-		log.Println("Channel is full")
+		log.Printf("Channel %v is full \n", channel)
 	}
+}
+
+func (r *Review) AfterCreate(tx *gorm.DB) error {
+	broadcastMessage(middleware.ReviewChannelWs, "AfterCreate Review")
+	broadcastMessage(middleware.ReviewChannelSse, "AfterCreate Review")
 	return nil
 }
 
 func (r *Review) AfterUpdate(tx *gorm.DB) error {
 	select {
 	// Attempt to send message without blocking when buffer is full
-	case middleware.ReviewChannel <- "AfterUpdate Review":
+	case middleware.ReviewChannelWs <- "AfterUpdate Review":
+	case middleware.ReviewChannelSse <- "AfterCreate Review":
 	default:
 		log.Println("Channel is full")
 	}

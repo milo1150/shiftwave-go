@@ -31,6 +31,8 @@ var (
 			return false
 		},
 	}
-	ReviewChannel  = make(chan string, 100)
-	ActiveChannels sync.Map
+	ReviewChannelWs   = make(chan string, 100)
+	ActiveWsChannels  sync.Map
+	ReviewChannelSse  = make(chan string, 100)
+	ActiveSseChannels sync.Map
 )
