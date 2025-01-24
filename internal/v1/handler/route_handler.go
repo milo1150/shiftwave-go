@@ -55,6 +55,10 @@ func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 		return GetAverageRatingHandler(c, app)
 	})
 
+	reviewsGroup.GET("/sse", func(c echo.Context) error {
+		return ReviewSse(c)
+	})
+
 	// TODO: Grouping with JWT auth
 	e.GET("/v1/reviews/s-ws", func(c echo.Context) error {
 		return ReviewWsSingleConnection(c, app)
@@ -64,10 +68,6 @@ func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 		return ReviewWsMultipleConnection(c, app)
 	})
 
-	// TODO: JWT auth
-	e.GET("/v1/reviews/sse", func(c echo.Context) error {
-		return ReviewSse(c)
-	})
 }
 
 func reviewRoute(e *echo.Echo, app *types.App) {

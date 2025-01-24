@@ -34,8 +34,15 @@ func InitPermission(db *gorm.DB) *casbin.Enforcer {
 }
 
 func addPolicy(enforcer *casbin.Enforcer) {
+	// Role - Admin
 	enforcer.AddPolicy("admin", "/v1/reviews")
 	enforcer.AddPolicy("admin", "/v1/reviews/average-rating")
+	enforcer.AddPolicy("admin", "/v1/reviews/sse")
+
+	// Role - User
+	enforcer.AddPolicy("user", "/v1/reviews")
+	enforcer.AddPolicy("user", "/v1/reviews/average-rating")
+	enforcer.AddPolicy("user", "/v1/reviews/sse")
 }
 
 func removePolicy(enforcer *casbin.Enforcer) {
