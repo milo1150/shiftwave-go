@@ -25,6 +25,9 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
 # Copy the .env file from the deployments directory
 COPY deployments/.env ./
 
+# Copy the rbac_model.conf file 
+COPY rbac_model.conf ./
+
 # Runtime stage
 FROM debian:bullseye-slim
 WORKDIR /app
@@ -34,6 +37,9 @@ COPY --from=builder /app/main .
 
 # Copy the .env file to the runtime image
 COPY --from=builder /app/.env .
+
+# Copy the rbac_model.conf file to the runtime image
+COPY --from=builder /app/rbac_model.conf .
 
 # Copy the master_data.json file to the runtime image
 COPY internal/resources/master_data.json ./internal/resources/
