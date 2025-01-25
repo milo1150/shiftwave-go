@@ -13,6 +13,7 @@ type Env struct {
 	OpenAI        string
 	JWT           string
 	AdminPassword string
+	RedisPassword string
 }
 
 type App struct {

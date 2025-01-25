@@ -7,11 +7,11 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-func NewRedisClient() *redis.Client {
+func NewRedisClient(password string) *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "redis:6379", // Use the Redis service name in Docker Compose
-		Password: "",           // no password set
-		DB:       0,            // use default DB
+		Password: password,
+		DB:       0, // use default DB
 	})
 	return rdb
 }
@@ -51,4 +51,8 @@ func LogAllRedisKeysAndValues(ctx context.Context, rdb *redis.Client) error {
 
 func GetRateLimitKey(ip, date string) string {
 	return fmt.Sprintf("rate_limit:%s:%s", ip, date)
+}
+
+func GetJwtKey(username string) string {
+	return fmt.Sprintf("jwt:%s", username)
 }

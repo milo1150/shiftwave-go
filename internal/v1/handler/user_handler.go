@@ -3,9 +3,11 @@ package handler
 import (
 	"net/http"
 	"shiftwave-go/internal/auth"
+	"shiftwave-go/internal/database"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	v1repo "shiftwave-go/internal/v1/repository"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -43,6 +45,13 @@ func LoginHandler(c echo.Context, app *types.App) error {
 	token, err := auth.GenerateToken(app.ENV.JWT, user.Username, int(user.ID), user.Role, user.ActiveStatus)
 	if err != nil {
 		return err
+	}
+
+	// Store token in redis
+	rdJwtKey := database.GetJwtKey(user.Username)
+	r := app.RDB.Set(c.Request().Context(), rdJwtKey, token, 24*time.Hour)
+	if r.Err() != nil {
+		return echo.ErrInternalServerError
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{"token": token})

@@ -21,17 +21,17 @@ import (
 // @description This is a sample API documentation for Echo with Swagger.
 // @BasePath /v1
 func main() {
+	// Load and construct env
+	env := setup.EnvLoader()
+
 	// Initialize the database
 	db := database.InitDatabase()
 
 	// Initialize Redis client
-	rdb := database.NewRedisClient()
+	rdb := database.NewRedisClient(env.RedisPassword)
 
 	// Initialize Permission (Casbin)
 	enforcer := auth.InitPermission(db)
-
-	// Load and construct env
-	env := setup.EnvLoader()
 
 	// Create application context
 	ctx := context.Background()

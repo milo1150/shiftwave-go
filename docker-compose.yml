@@ -20,7 +20,19 @@ services:
     container_name: redis
     ports:
       - '6379:6379'
-    command: ['redis-server', '--appendonly', 'yes'] # Enable persistence (optional)
+    command:
+      [
+        'redis-server',
+        '--appendonly',
+        'yes',
+        '--save',
+        '60',
+        '1',
+        '--requirepass',
+        '${REDIS_PASSWORD}',
+      ]
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
@@ -44,6 +56,12 @@ services:
       - .:/app
       - /app/tmp
     working_dir: /app
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   postgres-data:
+  redis-data:

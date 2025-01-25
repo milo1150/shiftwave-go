@@ -45,5 +45,12 @@ func EnvLoader() types.Env {
 	}
 	env.AdminPassword = adminPassword
 
+	// Redis pwd
+	redisPassword := os.Getenv("REDIS_PASSWORD")
+	if redisPassword == "" {
+		log.Fatalf("redis password should be not empty")
+	}
+	env.RedisPassword = redisPassword
+
 	return env
 }
