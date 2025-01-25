@@ -48,3 +48,7 @@ func LogAllRedisKeysAndValues(ctx context.Context, rdb *redis.Client) error {
 	}
 	return nil
 }
+
+func GetRateLimitKey(ip, date string) string {
+	return fmt.Sprintf("rate_limit:%s:%s", ip, date)
+}

@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"time"
@@ -33,7 +32,7 @@ func ConfigRateLimiter() echo.MiddlewareFunc {
 	return middleware.RateLimiterWithConfig(config)
 }
 
-func IpRateLimiterMiddleware(rdb *redis.Client, ctx context.Context, limit uint64) echo.MiddlewareFunc {
+func IpRateLimiterMiddleware(rdb *redis.Client, limit uint64) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Generate a unique key for this IP and date
@@ -41,7 +40,7 @@ func IpRateLimiterMiddleware(rdb *redis.Client, ctx context.Context, limit uint6
 			key := fmt.Sprintf("rate_limit:%s:%s", c.RealIP(), today)
 
 			// Increment request count
-			count, err := rdb.Incr(ctx, key).Result()
+			count, err := rdb.Incr(c.Request().Context(), key).Result()
 			if err != nil {
 				fmt.Println(err)
 				return c.JSON(http.StatusInternalServerError, map[string]string{
@@ -51,7 +50,7 @@ func IpRateLimiterMiddleware(rdb *redis.Client, ctx context.Context, limit uint6
 
 			// Set TTL for key if it's the first request today
 			if count >= 1 {
-				rdb.Expire(ctx, key, 1*time.Minute)
+				rdb.Expire(c.Request().Context(), key, 1*time.Hour)
 			}
 
 			// Check if the IP exceeded the daily limit

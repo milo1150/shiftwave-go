@@ -23,7 +23,7 @@ func (r *RouteV1) SetupRoutes() {
 	reviewsRoute(r.Echo, r.App, r.Enforcer)
 
 	// /v1/review
-	reviewRoute(r.Echo, r.App)
+	reviewRoute(r.Echo, r.App, r.Enforcer)
 
 	// /v1/branch
 	branchRoute(r.Echo, r.App)
@@ -70,15 +70,19 @@ func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 
 }
 
-func reviewRoute(e *echo.Echo, app *types.App) {
+func reviewRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	reviewGroup := e.Group("/v1/review")
 
 	reviewGroup.POST("", func(c echo.Context) error {
 		return CreateReviewHandler(c, app.DB)
-	}, middleware.IpRateLimiterMiddleware(app.RDB, app.Context, 1))
+	}, middleware.IpRateLimiterMiddleware(app.RDB, 1))
 
 	reviewGroup.GET("/:id", func(c echo.Context) error {
 		return GetReviewHandler(c, app)
+	}, auth.Jwt(e, app.ENV), middleware.RoutePermission(app.ENV.JWT, enforcer))
+
+	e.GET("/v1/review/limit", func(c echo.Context) error {
+		return CheckDailyLimit(c, app.RDB)
 	})
 }
 

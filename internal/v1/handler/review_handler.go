@@ -6,16 +6,19 @@ import (
 	"log"
 	"net/http"
 	"shiftwave-go/internal/connection"
+	"shiftwave-go/internal/database"
 	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	v1repository "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
 	"strconv"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -287,4 +290,18 @@ func ReviewSse(c echo.Context) error {
 	close(done)
 
 	return nil
+}
+
+func CheckDailyLimit(c echo.Context, rdb *redis.Client) error {
+	today := time.Now().Format(time.DateOnly)
+	ip := c.RealIP()
+	key := database.GetRateLimitKey(ip, today)
+
+	// Find key value
+	val, _ := rdb.Get(c.Request().Context(), key).Result()
+	if val != "" {
+		return c.JSON(http.StatusTooManyRequests, "limit")
+	}
+
+	return c.JSON(http.StatusOK, http.StatusOK)
 }
