@@ -1,20 +1,20 @@
 package dto
 
 import (
+	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/model"
-	mainTypes "shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	"time"
 )
 
 type GetReviewDTO struct {
-	ID        uint           `json:"id"`
-	CreatedAt string         `json:"created_at"`
-	UpdatedAt string         `json:"updated_at"`
-	Remark    string         `json:"remark"`
-	Score     uint           `json:"score"`
-	Lang      mainTypes.Lang `json:"lang"`
-	RemarkEn  string         `json:"remark_en"`
+	ID        uint      `json:"id"`
+	CreatedAt string    `json:"created_at"`
+	UpdatedAt string    `json:"updated_at"`
+	Remark    string    `json:"remark"`
+	Score     uint      `json:"score"`
+	Lang      enum.Lang `json:"lang"`
+	RemarkEn  string    `json:"remark_en"`
 }
 
 func TransformGetReviews(reviews []model.Review, timezone *time.Location) []GetReviewDTO {

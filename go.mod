@@ -7,7 +7,6 @@ require (
 	github.com/brianvoe/gofakeit/v7 v7.1.2
 	github.com/casbin/casbin/v2 v2.103.0
 	github.com/casbin/gorm-adapter/v3 v3.32.0
-	github.com/davecgh/go-spew v1.1.1
 	github.com/go-co-op/gocron/v2 v2.14.2
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
@@ -25,6 +24,7 @@ require (
 	golang.org/x/time v0.9.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
+	github.com/davecgh/go-spew v1.1.1
 )
 
 require (

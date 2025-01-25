@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 	v1dto "shiftwave-go/internal/v1/dto"
@@ -13,7 +14,7 @@ import (
 )
 
 func CreateReview(db *gorm.DB, payload *v1types.CreateReviewPayload) error {
-	parseLang, err := types.ParseLang(payload.Lang)
+	parseLang, err := enum.ParseLang(payload.Lang)
 	if err != nil {
 		return err
 	}
@@ -236,7 +237,7 @@ func getDateReviewsQuery(db *gorm.DB, start string, loc time.Location) (*gorm.DB
 	return query, nil
 }
 
-func RetrieveReviewsByLang(db *gorm.DB, loc time.Location, lang types.Lang, duration time.Duration) (*[]model.Review, error) {
+func RetrieveReviewsByLang(db *gorm.DB, loc time.Location, lang enum.Lang, duration time.Duration) (*[]model.Review, error) {
 	location, err := time.LoadLocation(loc.String())
 	if err != nil {
 		return nil, fmt.Errorf("invalid location")

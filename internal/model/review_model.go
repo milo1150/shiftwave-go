@@ -4,17 +4,17 @@ import (
 	"errors"
 	"log"
 	"shiftwave-go/internal/connection"
-	"shiftwave-go/internal/types"
+	"shiftwave-go/internal/enum"
 
 	"gorm.io/gorm"
 )
 
 type Review struct {
 	gorm.Model
-	Remark   string     `json:"remark"`
-	Score    uint       `json:"score"`
-	Lang     types.Lang `json:"lang" gorm:"default='TH'"`
-	RemarkEn string     `json:"remark_en"`
+	Remark   string    `json:"remark"`
+	Score    uint      `json:"score"`
+	Lang     enum.Lang `json:"lang" gorm:"default='TH'"`
+	RemarkEn string    `json:"remark_en"`
 
 	BranchID uint   `gorm:"not null"`                                       // Foreign key referencing the Branch model
 	Branch   Branch `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // One-to-One relationship

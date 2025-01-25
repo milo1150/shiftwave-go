@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/types"
 	v1repo "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
@@ -34,7 +35,7 @@ func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.Us
 	}
 
 	// Query review list
-	reviews, err := v1repo.RetrieveReviewsByLang(app.DB, *app.ENV.LocalTimezone, types.LangMY, -10*time.Hour)
+	reviews, err := v1repo.RetrieveReviewsByLang(app.DB, *app.ENV.LocalTimezone, enum.LangMY, -10*time.Hour)
 	if err != nil {
 		return nil, nil, err
 	}

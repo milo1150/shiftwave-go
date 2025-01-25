@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
@@ -39,7 +40,7 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 	}
 
 	// :)
-	parseLang, _ := types.ParseLang(q.Lang)
+	parseLang, _ := enum.ParseLang(q.Lang)
 
 	reviews := []v1dto.GetReviewDTO{}
 	for i := 0; i < q.Count; i++ {

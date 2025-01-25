@@ -51,7 +51,7 @@ func IpRateLimiterMiddleware(rdb *redis.Client, ctx context.Context, limit uint6
 
 			// Set TTL for key if it's the first request today
 			if count >= 1 {
-				rdb.Expire(ctx, key, 2*time.Second)
+				rdb.Expire(ctx, key, 1*time.Minute)
 			}
 
 			// Check if the IP exceeded the daily limit
