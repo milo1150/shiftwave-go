@@ -300,7 +300,7 @@ func CheckDailyLimit(c echo.Context, rdb *redis.Client) error {
 	// Find key value
 	val, _ := rdb.Get(c.Request().Context(), key).Result()
 	if val != "" {
-		return c.JSON(http.StatusTooManyRequests, "limit")
+		return c.JSON(http.StatusTooManyRequests, "Rate limit exceed. Try again tomorrow.")
 	}
 
 	return c.JSON(http.StatusOK, http.StatusOK)

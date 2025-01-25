@@ -3,6 +3,7 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+	"shiftwave-go/internal/database"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -36,8 +37,9 @@ func IpRateLimiterMiddleware(rdb *redis.Client, limit uint64) echo.MiddlewareFun
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Generate a unique key for this IP and date
-			today := time.Now().Format("2006-01-02")
-			key := fmt.Sprintf("rate_limit:%s:%s", c.RealIP(), today)
+			today := time.Now().Format(time.DateOnly)
+			ip := c.RealIP()
+			key := database.GetRateLimitKey(ip, today)
 
 			// Increment request count
 			count, err := rdb.Incr(c.Request().Context(), key).Result()
@@ -48,7 +50,7 @@ func IpRateLimiterMiddleware(rdb *redis.Client, limit uint64) echo.MiddlewareFun
 				})
 			}
 
-			// Set TTL for key if it's the first request today
+			// Set TTL (Time To Live) for key if it's the first request today
 			if count >= 1 {
 				rdb.Expire(c.Request().Context(), key, 1*time.Hour)
 			}
