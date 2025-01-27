@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"log"
+	"net/http"
 	"shiftwave-go/internal/auth"
 
 	"github.com/casbin/casbin/v2"
@@ -32,7 +33,7 @@ func RoutePermission(secretJwt string, e *casbin.Enforcer) echo.MiddlewareFunc {
 
 			// Throw error if permission not allowed
 			if !allowed {
-				return echo.ErrUnauthorized
+				return c.JSON(http.StatusForbidden, map[string]string{"error": "Permission denied"})
 			}
 
 			return next(c)
