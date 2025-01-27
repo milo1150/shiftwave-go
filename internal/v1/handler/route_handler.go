@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"shiftwave-go/internal/auth"
 	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 
@@ -17,22 +16,22 @@ type RouteV1 struct {
 
 func (r *RouteV1) SetupRoutes() {
 	// /v1/user
-	userRoute(r.Echo, r.App)
+	userRoute(r.Echo, r.App, r.Enforcer)
 
 	// /v1/reviews
 	reviewsRoute(r.Echo, r.App, r.Enforcer)
 
 	// /v1/review
-	reviewRoute(r.Echo, r.App, r.Enforcer)
+	reviewRoute(r.Echo, r.App)
 
 	// /v1/branch
-	branchRoute(r.Echo, r.App)
+	branchRoute(r.Echo, r.App, r.Enforcer)
 
 	// /v1/branches
-	branchesRoute(r.Echo, r.App, r.Enforcer)
+	branchesRoute(r.Echo, r.App)
 }
 
-func userRoute(e *echo.Echo, app *types.App) {
+func userRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	userGroup := e.Group("/v1/user")
 
 	userGroup.POST("/login", func(c echo.Context) error {
@@ -41,11 +40,11 @@ func userRoute(e *echo.Echo, app *types.App) {
 
 	userGroup.POST("/create-user", func(c echo.Context) error {
 		return CreateUser(c, app)
-	})
+	}, middleware.AdminMiddlewares(e, app, enforcer)...)
 }
 
 func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
-	reviewsGroup := e.Group("/v1/reviews", auth.Jwt(e, app.ENV), middleware.RoutePermission(app.ENV.JWT, enforcer))
+	reviewsGroup := e.Group("/v1/reviews", middleware.AdminMiddlewares(e, app, enforcer)...)
 
 	reviewsGroup.GET("", func(c echo.Context) error {
 		return GetReviewsHandler(c, app)
@@ -64,30 +63,27 @@ func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 		return ReviewWsSingleConnection(c, app)
 	})
 
+	// TODO: Grouping with JWT auth
 	e.GET("/v1/reviews/m-ws", func(c echo.Context) error {
 		return ReviewWsMultipleConnection(c, app)
 	})
 
 }
 
-func reviewRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
+func reviewRoute(e *echo.Echo, app *types.App) {
 	reviewGroup := e.Group("/v1/review")
 
 	reviewGroup.POST("", func(c echo.Context) error {
 		return CreateReviewHandler(c, app.DB)
 	}, middleware.IpRateLimiterMiddleware(app.RDB, 1))
 
-	reviewGroup.GET("/:id", func(c echo.Context) error {
-		return GetReviewHandler(c, app)
-	}, auth.Jwt(e, app.ENV), middleware.RoutePermission(app.ENV.JWT, enforcer))
-
 	e.GET("/v1/review/limit", func(c echo.Context) error {
 		return CheckDailyLimit(c, app.RDB)
 	})
 }
 
-func branchRoute(e *echo.Echo, app *types.App) {
-	branchGroup := e.Group("/v1/branch")
+func branchRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
+	branchGroup := e.Group("/v1/branch", middleware.AdminMiddlewares(e, app, enforcer)...)
 
 	branchGroup.POST("", func(c echo.Context) error {
 		return CreateBranchHandler(c, app.DB)
@@ -98,8 +94,8 @@ func branchRoute(e *echo.Echo, app *types.App) {
 	})
 }
 
-func branchesRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
-	branchesGroup := e.Group("/v1/branches", auth.Jwt(e, app.ENV), middleware.RoutePermission(app.ENV.JWT, enforcer))
+func branchesRoute(e *echo.Echo, app *types.App) {
+	branchesGroup := e.Group("/v1/branches")
 
 	branchesGroup.GET("", func(c echo.Context) error {
 		return GetBranchesHandler(c, app.DB)

@@ -3,8 +3,6 @@ package auth
 import (
 	"time"
 
-	"shiftwave-go/internal/types"
-
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -20,15 +18,8 @@ type JwtCustomClaims struct {
 	jwt.RegisteredClaims        // struct embedding (in ts call extend interface)
 }
 
-func ConfigJWT(secret string) echo.MiddlewareFunc {
-	// WithConfig returns a JSON Web Token (JWT) auth middleware or panics if configuration is invalid.
-	//
-	// For valid token, it sets the user in context and calls next handler.
-	// For invalid token, it returns "401 - Unauthorized" error.
-	// For missing token, it returns "400 - Bad Request" error.
-	//
-	// See: https://jwt.io/introduction
-	return echojwt.WithConfig(echojwt.Config{
+func JwtConfig(secret string) echojwt.Config {
+	return echojwt.Config{
 		SigningKey: []byte(secret),
 
 		// Context key to store user information from the token into context.
@@ -53,20 +44,6 @@ func ConfigJWT(secret string) echo.MiddlewareFunc {
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(JwtCustomClaims)
 		},
-	})
-}
-
-func Jwt(e *echo.Echo, env types.Env) echo.MiddlewareFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			// Run JWT Extraction.
-			// Call nested function [(next)(c)] until get an error.
-			if err := ConfigJWT(env.JWT)(next)(c); err != nil {
-				return err
-			}
-
-			return nil
-		}
 	}
 }
 
