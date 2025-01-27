@@ -5,6 +5,7 @@ import (
 	"shiftwave-go/internal/model"
 	v1types "shiftwave-go/internal/v1/types"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -40,4 +41,15 @@ func UpdateBranch(db *gorm.DB, id int, payload *v1types.UpdateBranchPayload) err
 	}
 
 	return nil
+}
+
+func FindBranchbyUUID(db *gorm.DB, uuid uuid.UUID) (*model.Branch, error) {
+	branch := &model.Branch{}
+
+	query := db.Where("uuid = ?", uuid).First(branch)
+	if err := query.Error; err != nil {
+		return nil, err
+	}
+
+	return branch, nil
 }

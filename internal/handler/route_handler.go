@@ -15,7 +15,7 @@ func SetupRoutes(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	e.GET("/swagger/*", echoSwagger.WrapHandler, middleware.ValidateJwt(e, app))
 
 	e.GET("/generate-pdf", func(c echo.Context) error {
-		return GenerateQRCodeHandler(c)
+		return GenerateQRCodeHandler(c, app.DB)
 	}, middleware.JwtAndPermissionMiddlewares(e, app, enforcer)...)
 
 	e.GET("/generate-random-reviews", func(c echo.Context) error {

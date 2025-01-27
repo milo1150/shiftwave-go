@@ -6,12 +6,14 @@ import (
 	"shiftwave-go/internal/services"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
+	"shiftwave-go/internal/v1/repository"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
-func GenerateQRCodeHandler(c echo.Context) error {
+func GenerateQRCodeHandler(c echo.Context, db *gorm.DB) error {
 	q := &types.GeneratePdfParams{}
 	if err := c.Bind(q); err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid Query")
@@ -24,7 +26,12 @@ func GenerateQRCodeHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
 
-	m := services.GenerateReviewQRcode(os.Getenv("BASE_URL"), q.BranchId)
+	_, err := repository.FindBranchbyUUID(db, q.BranchUuid)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid uuid")
+	}
+
+	m := services.GenerateReviewQRcode(os.Getenv("BASE_URL"), q.BranchUuid)
 
 	document, err := m.Generate()
 	if err != nil {
