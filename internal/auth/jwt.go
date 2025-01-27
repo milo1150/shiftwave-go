@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"shiftwave-go/internal/enum"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -11,11 +12,11 @@ import (
 // jwtCustomClaims are custom claims extending default ones.
 // See https://github.com/golang-jwt/jwt for more examples
 type JwtCustomClaims struct {
-	Name                 string `json:"name"`
-	ID                   int    `json:"id"`
-	ActiveStatus         bool   `json:"active_status"`
-	Role                 string `json:"role"`
-	jwt.RegisteredClaims        // struct embedding (in ts call extend interface)
+	Name                 string    `json:"name"`
+	ID                   int       `json:"id"`
+	ActiveStatus         bool      `json:"active_status"`
+	Role                 enum.Role `json:"role"`
+	jwt.RegisteredClaims           // struct embedding (in ts call extend interface)
 }
 
 func JwtConfig(secret string) echojwt.Config {
@@ -48,7 +49,7 @@ func JwtConfig(secret string) echojwt.Config {
 }
 
 // Generate encoded jwt token for client
-func GenerateToken(secret string, name string, id int, role string, status bool) (string, error) {
+func GenerateToken(secret string, name string, id int, role enum.Role, status bool) (string, error) {
 	// Set custom claims
 	claims := &JwtCustomClaims{
 		Name:         name,

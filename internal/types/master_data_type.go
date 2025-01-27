@@ -1,5 +1,7 @@
 package types
 
+import "shiftwave-go/internal/enum"
+
 // Use in resources/master_data.json
 type MasterDataJson struct {
 	Branches []BranchMasterData `json:"branches" validate:"required,dive"`
@@ -11,6 +13,6 @@ type BranchMasterData struct {
 }
 
 type UserMasterData struct {
-	Username string `json:"username" validate:"required"`
-	Role     string `json:"role"`
+	Username string    `json:"username" validate:"required"`
+	Role     enum.Role `json:"role"`
 }

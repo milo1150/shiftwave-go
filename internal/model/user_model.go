@@ -2,23 +2,17 @@ package model
 
 import (
 	"errors"
+	"shiftwave-go/internal/enum"
 
 	"gorm.io/gorm"
 )
 
-type Role string
-
-const (
-	RoleUser  Role = "user"
-	RoleAdmin Role = "admin"
-)
-
 type User struct {
 	gorm.Model
-	Username     string `gorm:"size:255;not null;unique"`
-	Password     string `gorm:"not null"`
-	ActiveStatus bool   `gorm:"default:true"`
-	Role         string `gorm:"default:'user'"`
+	Username     string    `gorm:"size:255;not null;unique"`
+	Password     string    `gorm:"not null"`
+	ActiveStatus bool      `gorm:"default:true"`
+	Role         enum.Role `gorm:"default:'user'"`
 
 	Branches []Branch `gorm:"many2many:users_branches"`
 }

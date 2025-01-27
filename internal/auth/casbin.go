@@ -23,6 +23,7 @@ func InitPermission(db *gorm.DB) *casbin.Enforcer {
 	}
 
 	// Register KeyMatch2 function
+	// See https://casbin.org/docs/function/ and https://casbin.org/docs/rbac-with-pattern
 	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 
 	// Add Route Guard
