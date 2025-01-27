@@ -5,6 +5,7 @@ import (
 	"log"
 	"shiftwave-go/internal/model"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -15,6 +16,24 @@ func migrateBranchTable(db *gorm.DB) {
 		err := db.Migrator().DropColumn(&model.Branch{}, "active")
 		if err != nil {
 			log.Fatalf("Failed to drop Active column in Branch table")
+		}
+	}
+
+	if db.Migrator().HasColumn(&model.Branch{}, "uuid") {
+		branches := &[]model.Branch{}
+
+		query := db.Debug().Model(&model.Branch{}).Where("uuid IS NULL").Find(&branches)
+		if err := query.Error; err != nil {
+			log.Fatalf("Failed to fetch branches with null uuid: %v", err)
+		}
+
+		if len(*branches) > 0 {
+			for _, branch := range *branches {
+				query := db.Model(&model.Branch{}).Where("id = ?", branch.ID).Update("uuid", uuid.New())
+				if err := query.Error; err != nil {
+					log.Fatalf("Failed to update branch uuid: %v", err)
+				}
+			}
 		}
 	}
 }
