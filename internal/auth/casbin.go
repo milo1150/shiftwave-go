@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v2/util"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"gorm.io/gorm"
 )
@@ -20,6 +21,9 @@ func InitPermission(db *gorm.DB) *casbin.Enforcer {
 	if err != nil {
 		log.Fatalf("Error load enforcer: %v", err)
 	}
+
+	// Register KeyMatch2 function
+	enforcer.AddNamedMatchingFunc("g", "KeyMatch2", util.KeyMatch2)
 
 	// Add Route Guard
 	addPolicy(enforcer)
@@ -39,6 +43,7 @@ func addPolicy(enforcer *casbin.Enforcer) {
 	enforcer.AddPolicy("admin", "/v1/reviews/average-rating")
 	enforcer.AddPolicy("admin", "/v1/reviews/sse")
 	enforcer.AddPolicy("admin", "/v1/branches")
+	enforcer.AddPolicy("admin", "/v1/branch/:id")
 
 	// Role - User
 	enforcer.AddPolicy("user", "/v1/reviews")
@@ -47,5 +52,5 @@ func addPolicy(enforcer *casbin.Enforcer) {
 }
 
 func removePolicy(enforcer *casbin.Enforcer) {
-	enforcer.RemovePolicy("admin", "/v1/average-rating")
+	// enforcer.RemovePolicy("admin", "/v1/average-rating")
 }

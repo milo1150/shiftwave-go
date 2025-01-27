@@ -69,5 +69,5 @@ func UpdateBranchHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("%v, Unable to Update Branch", err)})
 	}
 
-	return c.JSON(http.StatusCreated, http.StatusCreated)
+	return c.JSON(http.StatusOK, http.StatusOK)
 }

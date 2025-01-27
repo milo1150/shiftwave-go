@@ -16,7 +16,9 @@ func CreateBranch(db *gorm.DB, branchName string) error {
 func GetBranches(db *gorm.DB) (*[]model.Branch, error) {
 	branches := &[]model.Branch{}
 
-	if err := db.Find(branches).Error; err != nil {
+	query := db.Order("id DESC").Find(branches)
+
+	if err := query.Error; err != nil {
 		return nil, err
 	}
 
