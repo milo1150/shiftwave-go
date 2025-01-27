@@ -54,7 +54,7 @@ func main() {
 	middleware.SetupMiddlewares(e, app.ENV)
 
 	// Base Route
-	baseHandler.SetupRoutes(e, app)
+	baseHandler.SetupRoutes(e, app, enforcer)
 	// V1 Route
 	routeV1 := v1handler.RouteV1(v1handler.RouteV1{Echo: e, App: app, Enforcer: enforcer})
 	routeV1.SetupRoutes()

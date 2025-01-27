@@ -16,6 +16,13 @@ func SetupMiddlewares(e *echo.Echo, env types.Env) {
 	e.Use(ConfigRateLimiter())
 }
 
+func JwtAndPermissionMiddlewares(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) []echo.MiddlewareFunc {
+	return []echo.MiddlewareFunc{
+		ValidateJwt(e, app),
+		RoutePermission(app.ENV.JWT, enforcer),
+	}
+}
+
 func AdminMiddlewares(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) []echo.MiddlewareFunc {
 	return []echo.MiddlewareFunc{
 		ValidateJwt(e, app),
