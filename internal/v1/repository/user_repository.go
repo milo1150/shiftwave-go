@@ -23,6 +23,7 @@ func CreateUser(db *gorm.DB, payload *types.CreateUserPayload) error {
 		return err
 	}
 
+	// TODO:
 	// Create user
 	result := db.Create(&model.User{Username: payload.Username, Password: hashPassword})
 	if result.Error != nil {

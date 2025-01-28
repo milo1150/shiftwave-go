@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"shiftwave-go/internal/auth"
@@ -24,8 +23,6 @@ func RoutePermission(secretJwt string, e *casbin.Enforcer) echo.MiddlewareFunc {
 			claim := user.Claims.(*auth.JwtCustomClaims)
 			path := c.Request().URL.Path
 			role := claim.Role.ToString()
-
-			fmt.Println(role, path)
 
 			// Validate route
 			allowed, err := e.Enforce(role, path)

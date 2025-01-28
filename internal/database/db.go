@@ -22,7 +22,7 @@ func migrateBranchTable(db *gorm.DB) {
 	if db.Migrator().HasColumn(&model.Branch{}, "uuid") {
 		branches := &[]model.Branch{}
 
-		query := db.Debug().Model(&model.Branch{}).Where("uuid IS NULL").Find(&branches)
+		query := db.Model(&model.Branch{}).Where("uuid IS NULL").Find(&branches)
 		if err := query.Error; err != nil {
 			log.Fatalf("Failed to fetch branches with null uuid: %v", err)
 		}

@@ -32,15 +32,17 @@ func (r *RouteV1) SetupRoutes() {
 }
 
 func userRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
-	userGroup := e.Group("/v1/user")
-
-	userGroup.POST("/login", func(c echo.Context) error {
+	// Public
+	e.POST("/v1/login", func(c echo.Context) error {
 		return LoginHandler(c, app)
 	})
 
+	// Private
+	userGroup := e.Group("/v1/user", middleware.AdminMiddlewares(e, app, enforcer)...)
+
 	userGroup.POST("/create-user", func(c echo.Context) error {
 		return CreateUser(c, app)
-	}, middleware.AdminMiddlewares(e, app, enforcer)...)
+	})
 }
 
 func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
@@ -67,7 +69,6 @@ func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	e.GET("/v1/reviews/m-ws", func(c echo.Context) error {
 		return ReviewWsMultipleConnection(c, app)
 	})
-
 }
 
 func reviewRoute(e *echo.Echo, app *types.App) {

@@ -7,6 +7,7 @@ import (
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	v1repo "shiftwave-go/internal/v1/repository"
+	"shiftwave-go/internal/validators"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -72,13 +73,19 @@ func CreateUser(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, "Invalid payload")
 	}
 
-	// Validate login payload
+	// Initialize Validator with custom rules
 	v := validator.New()
+	v.RegisterValidation("userRole", validators.ValidateUserRole)
+	v.RegisterValidation("branches", validators.ValidateBranchesUuid)
+
+	// Validate login payload
 	if err := v.Struct(payload); err != nil {
 		validationErrors := err.(validator.ValidationErrors)
 		errorMessages := utils.ExtractErrorMessages(validationErrors)
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
+
+	// TODO: validate valid branch uuid
 
 	// Handle create user and error
 	err := v1repo.CreateUser(app.DB, payload)
