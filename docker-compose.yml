@@ -56,11 +56,6 @@ services:
       - .:/app
       - /app/tmp
     working_dir: /app
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
 volumes:
   postgres-data:
