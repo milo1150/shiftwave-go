@@ -1,11 +1,15 @@
 package dto
 
-import "shiftwave-go/internal/model"
+import (
+	"shiftwave-go/internal/model"
+
+	"github.com/google/uuid"
+)
 
 type BranchDto struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	IsActive bool   `json:"is_active"`
+	Uuid     uuid.UUID `json:"uuid"`
+	Name     string    `json:"name"`
+	IsActive bool      `json:"is_active"`
 }
 
 func TransformBranches(branches []model.Branch) []BranchDto {
@@ -23,7 +27,7 @@ func TransformBranches(branches []model.Branch) []BranchDto {
 
 func TransformBranch(branch model.Branch) BranchDto {
 	return BranchDto{
-		Id:       int(branch.ID),
+		Uuid:     branch.Uuid,
 		Name:     branch.Name,
 		IsActive: branch.IsActive,
 	}
