@@ -7,9 +7,9 @@ import (
 	v1dto "shiftwave-go/internal/v1/dto"
 	v1repo "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
-	"strconv"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
@@ -46,11 +46,11 @@ func GetBranchesHandler(c echo.Context, db *gorm.DB) error {
 }
 
 func UpdateBranchHandler(c echo.Context, db *gorm.DB) error {
-	param := c.Param("id")
+	param := c.Param("uuid")
 
-	id, err := strconv.Atoi(param)
+	parsedUUID, err := uuid.Parse(param)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, "Invalid param")
+		return c.JSON(http.StatusBadRequest, "Invalid uuid")
 	}
 
 	payload := &v1types.UpdateBranchPayload{}
@@ -65,7 +65,7 @@ func UpdateBranchHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, errorMessagees)
 	}
 
-	if err = v1repo.UpdateBranch(db, id, payload); err != nil {
+	if err := v1repo.UpdateBranch(db, parsedUUID, payload); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": fmt.Sprintf("%v, Unable to Update Branch", err)})
 	}
 

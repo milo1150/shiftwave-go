@@ -26,9 +26,9 @@ func GetBranches(db *gorm.DB) (*[]model.Branch, error) {
 	return branches, nil
 }
 
-func UpdateBranch(db *gorm.DB, id int, payload *v1types.UpdateBranchPayload) error {
+func UpdateBranch(db *gorm.DB, uuid uuid.UUID, payload *v1types.UpdateBranchPayload) error {
 	result := db.Model(&model.Branch{}).
-		Where("id = ?", id).
+		Where("uuid = ?", uuid).
 		Update("is_active", payload.IsActive).           // non-zero value
 		Updates(&model.Branch{Name: payload.BranchName}) // non-zero value
 
@@ -37,7 +37,7 @@ func UpdateBranch(db *gorm.DB, id int, payload *v1types.UpdateBranchPayload) err
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("no branch found with id %v", id)
+		return fmt.Errorf("no branch found with uuid %v", uuid)
 	}
 
 	return nil

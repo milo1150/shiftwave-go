@@ -89,7 +89,7 @@ func branchRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 		return CreateBranchHandler(c, app.DB)
 	})
 
-	branchGroup.PATCH("/:id", func(c echo.Context) error {
+	branchGroup.PATCH("/:uuid", func(c echo.Context) error {
 		return UpdateBranchHandler(c, app.DB)
 	})
 }
