@@ -55,6 +55,23 @@ func migrateUserTable(db *gorm.DB) {
 			log.Fatalf("Failed to drop column active_statue: %v.", err)
 		}
 	}
+
+	if db.Migrator().HasColumn(&model.User{}, "uuid") {
+		users := &[]model.User{}
+
+		query := db.Where("uuid IS NULL").Find(&users)
+		if err := query.Error; err != nil {
+			log.Fatalf("Failed to fetch users with null uuid: %v", err)
+		}
+
+		if len(*users) > 0 {
+			for _, user := range *users {
+				if err := db.Model(&model.User{}).Where("id = ?", user.ID).Update("uuid", uuid.New()).Error; err != nil {
+					log.Fatalf("Failed to update user uuid: %v", err.Error())
+				}
+			}
+		}
+	}
 }
 
 func InitDatabase() *gorm.DB {

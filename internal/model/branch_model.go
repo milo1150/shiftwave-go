@@ -14,6 +14,13 @@ type Branch struct {
 	Uuid     uuid.UUID `json:"uuid" gorm:"type:uuid;unique"`
 }
 
-func (B *Branch) BeforeDelete(tx *gorm.DB) error {
+func (b *Branch) BeforeDelete(tx *gorm.DB) error {
 	return errors.New("deletion of Branch is not allowed")
+}
+
+func (b *Branch) BeforeCreate(tx *gorm.DB) (err error) {
+	if b.Uuid == uuid.Nil {
+		b.Uuid = uuid.New() // Generates a new UUID before inserting
+	}
+	return nil
 }
