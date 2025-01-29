@@ -47,6 +47,10 @@ func userRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	userGroup.POST("/create-user", func(c echo.Context) error {
 		return CreateUserHandler(c, app)
 	})
+
+	userGroup.POST("/update-users", func(c echo.Context) error {
+		return UpdateUsersHandler(c, app)
+	})
 }
 
 func reviewsRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {

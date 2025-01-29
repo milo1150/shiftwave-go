@@ -13,8 +13,7 @@ type User struct {
 	Password     string    `gorm:"not null"`
 	ActiveStatus bool      `gorm:"default:true"`
 	Role         enum.Role `gorm:"default:'user'"`
-
-	Branches []Branch `gorm:"many2many:users_branches"`
+	Branches     []Branch  `gorm:"many2many:users_branches"`
 }
 
 func (u *User) BeforeDelete(tx *gorm.DB) error {

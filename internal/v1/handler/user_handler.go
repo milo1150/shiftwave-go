@@ -109,3 +109,22 @@ func GetAllUsersHandler(c echo.Context, app *types.App) error {
 
 	return c.JSON(http.StatusOK, usersDto)
 }
+
+func UpdateUsersHandler(c echo.Context, app *types.App) error {
+	// Extract request payload
+	payload := &[]types.UpdateUserPayload{}
+	if err := c.Bind(payload); err != nil {
+		return c.JSON(http.StatusBadRequest, "Invalid payload")
+	}
+
+	// Initialize Validator with custom rules
+	v := validator.New()
+	v.RegisterValidation("userRole", validators.ValidateUserRole)
+
+	// Validate slice payload
+	if err := validators.ValidateSlicePayload(c, v, payload); err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	return c.JSON(http.StatusOK, http.StatusOK)
+}
