@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 )
@@ -13,9 +14,9 @@ import (
 // See https://github.com/golang-jwt/jwt for more examples
 type JwtCustomClaims struct {
 	Name                 string    `json:"name"`
-	ID                   int       `json:"id"`
 	ActiveStatus         bool      `json:"active_status"`
 	Role                 enum.Role `json:"role"`
+	Uuid                 uuid.UUID `json:"uuid"`
 	jwt.RegisteredClaims           // struct embedding (in ts call extend interface)
 }
 
@@ -49,12 +50,12 @@ func JwtConfig(secret string) echojwt.Config {
 }
 
 // Generate encoded jwt token for client
-func GenerateToken(secret string, name string, id int, role enum.Role, status bool) (string, error) {
+func GenerateToken(secret string, name string, uuid uuid.UUID, role enum.Role, status bool) (string, error) {
 	// Set custom claims
 	claims := &JwtCustomClaims{
 		Name:         name,
-		ID:           id,
 		Role:         role,
+		Uuid:         uuid,
 		ActiveStatus: status,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),

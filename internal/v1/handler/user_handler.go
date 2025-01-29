@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/labstack/echo/v4"
 )
@@ -44,7 +45,7 @@ func LoginHandler(c echo.Context, app *types.App) error {
 	}
 
 	// Generate jwt token
-	token, err := auth.GenerateToken(app.ENV.JWT, user.Username, int(user.ID), user.Role, user.ActiveStatus)
+	token, err := auth.GenerateToken(app.ENV.JWT, user.Username, user.Uuid, user.Role, user.ActiveStatus)
 	if err != nil {
 		return err
 	}
@@ -105,9 +106,34 @@ func GetAllUsersHandler(c echo.Context, app *types.App) error {
 	}
 
 	// Transform Users
-	usersDto := dto.TransformUserModels(*users)
+	userDtos := dto.TransformUserModels(*users)
 
-	return c.JSON(http.StatusOK, usersDto)
+	return c.JSON(http.StatusOK, userDtos)
+}
+
+func GetUserHandler(c echo.Context, app *types.App) error {
+	// Extract user token from context
+	jwtToken, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid token"})
+	}
+
+	// Extract claims from token
+	claims, ok := jwtToken.Claims.(*auth.JwtCustomClaims)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid token claims"})
+	}
+
+	// Find users
+	user, err := v1repo.GetUserByUUID(app.DB, claims.Uuid)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, http.StatusInternalServerError)
+	}
+
+	// Transform Users
+	userDto := dto.TransformUserModel(*user)
+
+	return c.JSON(http.StatusOK, userDto)
 }
 
 func UpdateUsersHandler(c echo.Context, app *types.App) error {

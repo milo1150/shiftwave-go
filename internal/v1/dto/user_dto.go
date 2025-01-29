@@ -3,10 +3,12 @@ package dto
 import (
 	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/model"
+
+	"github.com/google/uuid"
 )
 
 type UserModelDto struct {
-	Id           int         `json:"id"`
+	Uuid         uuid.UUID   `json:"user_uuid"`
 	Username     string      `json:"username"`
 	ActiveStatus bool        `json:"active_status"`
 	Role         enum.Role   `json:"role"`
@@ -28,11 +30,11 @@ func TransformUserModels(users []model.User) []UserModelDto {
 
 func TransformUserModel(user model.User) UserModelDto {
 	dto := UserModelDto{
-		Id:           int(user.ID),
 		Username:     user.Username,
 		ActiveStatus: user.ActiveStatus,
 		Role:         user.Role,
 		Branch:       TransformBranches(user.Branches),
+		Uuid:         user.Uuid,
 	}
 	return dto
 }

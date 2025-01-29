@@ -7,6 +7,7 @@ import (
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 )
@@ -68,4 +69,14 @@ func GetAllUsers(db *gorm.DB) (*[]model.User, error) {
 	}
 
 	return users, nil
+}
+
+func GetUserByUUID(db *gorm.DB, uuid uuid.UUID) (*model.User, error) {
+	user := &model.User{}
+
+	if err := db.Preload("Branches").Where("uuid = ?", uuid).First(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

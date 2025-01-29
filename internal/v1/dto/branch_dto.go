@@ -7,7 +7,7 @@ import (
 )
 
 type BranchDto struct {
-	Uuid     uuid.UUID `json:"uuid"`
+	Uuid     uuid.UUID `json:"branch_uuid"`
 	Name     string    `json:"name"`
 	IsActive bool      `json:"is_active"`
 }
