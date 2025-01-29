@@ -52,8 +52,20 @@ func CreateUser(db *gorm.DB, payload *types.CreateUserPayload) error {
 
 func FindUser(db *gorm.DB, username string) (*model.User, error) {
 	user := &model.User{}
+
 	if err := db.First(user, &model.User{Username: username}).Error; err != nil {
 		return nil, err
 	}
+
 	return user, nil
+}
+
+func GetAllUsers(db *gorm.DB) (*[]model.User, error) {
+	users := &[]model.User{}
+
+	if err := db.Preload("Branches").Order("id DESC").Find(users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }

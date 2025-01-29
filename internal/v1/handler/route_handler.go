@@ -40,8 +40,12 @@ func userRoute(e *echo.Echo, app *types.App, enforcer *casbin.Enforcer) {
 	// Private
 	userGroup := e.Group("/v1/user", middleware.AdminMiddlewares(e, app, enforcer)...)
 
+	userGroup.GET("/get-users", func(c echo.Context) error {
+		return GetAllUsersHandler(c, app)
+	})
+
 	userGroup.POST("/create-user", func(c echo.Context) error {
-		return CreateUser(c, app)
+		return CreateUserHandler(c, app)
 	})
 }
 

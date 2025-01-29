@@ -6,6 +6,7 @@ import (
 	"shiftwave-go/internal/database"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
+	"shiftwave-go/internal/v1/dto"
 	v1repo "shiftwave-go/internal/v1/repository"
 	"shiftwave-go/internal/validators"
 	"time"
@@ -66,7 +67,7 @@ func LoginHandler(c echo.Context, app *types.App) error {
 // @Produce json
 // @Param payload body types.CreateUserPayload true "Payload Create User"
 // @Router /user [post]
-func CreateUser(c echo.Context, app *types.App) error {
+func CreateUserHandler(c echo.Context, app *types.App) error {
 	// Extract json payload
 	payload := &types.CreateUserPayload{}
 	if err := c.Bind(payload); err != nil {
@@ -94,4 +95,17 @@ func CreateUser(c echo.Context, app *types.App) error {
 	}
 
 	return c.JSON(http.StatusCreated, http.StatusCreated)
+}
+
+func GetAllUsersHandler(c echo.Context, app *types.App) error {
+	// Find users
+	users, err := v1repo.GetAllUsers(app.DB)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, http.StatusInternalServerError)
+	}
+
+	// Transform Users
+	usersDto := dto.TransformUserModels(*users)
+
+	return c.JSON(http.StatusOK, usersDto)
 }
