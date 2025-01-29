@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"shiftwave-go/internal/model"
 	v1types "shiftwave-go/internal/v1/types"
@@ -43,7 +44,7 @@ func UpdateBranch(db *gorm.DB, uuid uuid.UUID, payload *v1types.UpdateBranchPayl
 	return nil
 }
 
-func FindBranchbyUUID(db *gorm.DB, uuid uuid.UUID) (*model.Branch, error) {
+func FindBranchByUUID(db *gorm.DB, uuid uuid.UUID) (*model.Branch, error) {
 	branch := &model.Branch{}
 
 	query := db.Where("uuid = ?", uuid).First(branch)
@@ -52,4 +53,21 @@ func FindBranchbyUUID(db *gorm.DB, uuid uuid.UUID) (*model.Branch, error) {
 	}
 
 	return branch, nil
+}
+
+func FindBranchesByUUIDs(db *gorm.DB, uuids []uuid.UUID) (*[]model.Branch, error) {
+	if len(uuids) == 0 {
+		return nil, errors.New("uuids should not be empty")
+	}
+
+	branches := &[]model.Branch{}
+	if err := db.Where("uuid IN (?)", uuids).Find(branches).Error; err != nil {
+		return nil, err
+	}
+
+	if len(uuids) != len(*branches) {
+		return nil, fmt.Errorf("some branch not found")
+	}
+
+	return branches, nil
 }

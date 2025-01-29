@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"shiftwave-go/internal/auth"
+	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
 
@@ -17,15 +18,31 @@ func CreateUser(db *gorm.DB, payload *types.CreateUserPayload) error {
 		return errors.New("user already exists")
 	}
 
+	// Check is branches existed
+	branches, err := FindBranchesByUUIDs(db, payload.Branches)
+	if err != nil {
+		return err
+	}
+
+	// Validate Role enum
+	role, ok := enum.ParseRole(payload.Role)
+	if !ok {
+		return errors.New("invalid role")
+	}
+
 	// Encrypt password
 	hashPassword, err := auth.HashedPassword(payload.Password)
 	if err != nil {
 		return err
 	}
 
-	// TODO:
 	// Create user
-	result := db.Create(&model.User{Username: payload.Username, Password: hashPassword})
+	result := db.Create(&model.User{
+		Username: payload.Username,
+		Password: hashPassword,
+		Branches: *branches,
+		Role:     *role,
+	})
 	if result.Error != nil {
 		return result.Error.(*pgconn.PgError)
 	}

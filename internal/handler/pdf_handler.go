@@ -26,7 +26,7 @@ func GenerateQRCodeHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
 
-	_, err := repository.FindBranchbyUUID(db, q.BranchUuid)
+	_, err := repository.FindBranchByUUID(db, q.BranchUuid)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "Invalid uuid")
 	}

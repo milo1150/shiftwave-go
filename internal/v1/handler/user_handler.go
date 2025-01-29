@@ -76,7 +76,6 @@ func CreateUser(c echo.Context, app *types.App) error {
 	// Initialize Validator with custom rules
 	v := validator.New()
 	v.RegisterValidation("userRole", validators.ValidateUserRole)
-	v.RegisterValidation("branches", validators.ValidateBranchesUuid)
 
 	// Validate login payload
 	if err := v.Struct(payload); err != nil {
@@ -84,8 +83,6 @@ func CreateUser(c echo.Context, app *types.App) error {
 		errorMessages := utils.ExtractErrorMessages(validationErrors)
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
-
-	// TODO: validate valid branch uuid
 
 	// Handle create user and error
 	err := v1repo.CreateUser(app.DB, payload)
