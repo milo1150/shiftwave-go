@@ -15,6 +15,19 @@ APP_ENV=development
 LOCAL_TIMEZONE=Asia/Bangkok
 ```
 
+## Run development
+
+```bash
+docker-compose up --build
+```
+
+## Run production
+
+```bash
+docker-compose -f deployments/docker-compose.production.yml up --build
+```
+
+
 ## Directory Breakdown
 
 - internal/: Contains the core application code, segregated into
