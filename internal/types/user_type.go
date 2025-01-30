@@ -16,8 +16,9 @@ type CreateUserPayload struct {
 
 type UpdateUserPayload struct {
 	Role         string      `json:"role" validate:"userRole"`
-	Branches     []uuid.UUID `json:"branches" validate:"min=1"`
+	Branches     []uuid.UUID `json:"branches" validate:"min=1,unique"`
 	ActiveStatus bool        `json:"active_status" validate:"boolean"`
+	UserUuid     uuid.UUID   `json:"user_uuid" validate:"required"`
 }
 
 type UpdateUserPasswordPayload struct {

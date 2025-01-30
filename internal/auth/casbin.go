@@ -47,7 +47,7 @@ func addPolicy(enforcer *casbin.Enforcer) {
 	enforcer.AddPolicy("admin", "/v1/branches")
 	enforcer.AddPolicy("admin", "/v1/branch/:id")
 	enforcer.AddPolicy("admin", "/v1/user/create-user")
-	enforcer.AddPolicy("admin", "/v1/user/get-user")
+	enforcer.AddPolicy("admin", "/v1/user/user-profile")
 	enforcer.AddPolicy("admin", "/v1/user/get-users")
 	enforcer.AddPolicy("admin", "/v1/user/update-users")
 

@@ -80,3 +80,44 @@ func GetUserByUUID(db *gorm.DB, uuid uuid.UUID) (*model.User, error) {
 
 	return user, nil
 }
+
+func UpdateUsers(db *gorm.DB, payloads *[]types.UpdateUserPayload) error {
+	for _, payload := range *payloads {
+		// Find User
+		userModel := model.User{}
+		findUserQuery := db.Where("uuid = ?", payload.UserUuid).First(&userModel)
+		if findUserQuery.Error != nil {
+			return findUserQuery.Error
+		}
+
+		// Parse role enum
+		parseRole, ok := enum.ParseRole(payload.Role)
+		if !ok {
+			return errors.New("invalid user role")
+		}
+
+		// Update User detail
+		updateUserQuery := db.Model(&userModel).
+			Select("ActiveStatus", "Role").
+			Updates(model.User{
+				ActiveStatus: payload.ActiveStatus,
+				Role:         *parseRole,
+			})
+		if updateUserQuery.Error != nil {
+			return updateUserQuery.Error
+		}
+
+		// Find Branches
+		branchesModels, err := FindBranchesByUUIDs(db, payload.Branches)
+		if err != nil {
+			return err
+		}
+
+		// Update Uesr Branches
+		query := db.Model(&userModel).Association("Branches").Replace(branchesModels)
+		if query != nil {
+			return errors.New("failed up update user branchres")
+		}
+	}
+	return nil
+}

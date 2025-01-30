@@ -152,5 +152,10 @@ func UpdateUsersHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
+	// Update
+	if err := v1repo.UpdateUsers(app.DB, payload); err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
 	return c.JSON(http.StatusOK, http.StatusOK)
 }
