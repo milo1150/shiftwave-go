@@ -96,6 +96,11 @@ func UpdateUsers(db *gorm.DB, payloads *[]types.UpdateUserPayload) error {
 			return errors.New("invalid user role")
 		}
 
+		// Prevent inactive admin role
+		if *parseRole == enum.RoleAdmin {
+			payload.ActiveStatus = true
+		}
+
 		// Update User detail
 		updateUserQuery := db.Model(&userModel).
 			Select("ActiveStatus", "Role").
