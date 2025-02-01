@@ -17,8 +17,11 @@ type Review struct {
 	Lang     enum.Lang `json:"lang" gorm:"default='TH'"`
 	RemarkEn string    `json:"remark_en"`
 
+	// Depreated: Use BranchUUID instead
+	BranchID uint
+
 	// Foreign key field, Use when WHERE branch_uuid = ?
-	BranchUUID uuid.UUID `gorm:"type:uuid;not null"`
+	BranchUUID uuid.UUID `gorm:"type:uuid"`
 
 	// Explicit Foreign Key, One-to-One relationship, Use when Preload()
 	Branch Branch `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:BranchUUID;references:Uuid"`

@@ -48,20 +48,32 @@ func migrateReviewTable(db *gorm.DB) {
 	}
 
 	// Change relate between Review and Branch from ID to UUID
+	if !db.Migrator().HasColumn(&model.Review{}, "branch_uuid") {
+		if err := db.Migrator().AddColumn(&model.Review{}, "branch_uuid"); err != nil {
+			log.Fatalf("Failed to add column branch_uuid in review table: %v", err.Error())
+		}
+	}
+
 	if db.Migrator().HasColumn(&model.Review{}, "branch_id") && db.Migrator().HasColumn(&model.Review{}, "branch_uuid") {
 		reviews := []model.Review{}
-		if err := db.Debug().Where("branch_id IS NOT NULL").Preload("Branch").Find(&reviews).Error; err != nil {
-			log.Fatalf("Failed to query reviews: %v", err)
+		if err := db.Model(&model.Review{}).Where("branch_uuid IS NULL").Find(&reviews).Error; err != nil {
+			log.Fatalf("Failed to count reviews: %v", err.Error())
+		}
+
+		// If all data already has branch_uuid value then do nothing.
+		if len(reviews) == 0 {
+			return
 		}
 
 		for _, review := range reviews {
-			if err := db.Model(&review).Update("branch_uuid", review.Branch.Uuid).Error; err != nil {
-				log.Fatalf("Failed to update review branch_uuid: %v", err)
+			branch := model.Branch{}
+			if err := db.Where("id = ?", review.BranchID).Find(&branch).Error; err != nil {
+				log.Fatalf("Error branch not found: %v", err.Error())
 			}
-		}
 
-		if err := db.Migrator().DropColumn(&model.Review{}, "branch_id"); err != nil {
-			log.Fatalf("Error Drop branch_id column in Review table: %v", err)
+			if err := db.Model(&review).Update("branch_uuid", branch.Uuid).Error; err != nil {
+				log.Fatalf("Error update branch_uuid: %v", err.Error())
+			}
 		}
 	}
 }
