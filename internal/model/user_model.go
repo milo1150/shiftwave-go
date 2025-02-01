@@ -15,7 +15,7 @@ type User struct {
 	ActiveStatus bool      `gorm:"default:true"`
 	Role         enum.Role `gorm:"default:'user'"`
 	Branches     []Branch  `gorm:"many2many:users_branches"`
-	Uuid         uuid.UUID `gorm:"type:uuid;unique"`
+	Uuid         uuid.UUID `gorm:"type:uuid;uniqueIndex"`
 }
 
 func (u *User) BeforeDelete(tx *gorm.DB) error {

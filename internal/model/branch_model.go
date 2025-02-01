@@ -11,7 +11,7 @@ type Branch struct {
 	gorm.Model
 	Name     string    `json:"name"`
 	IsActive bool      `json:"is_active" gorm:"default:true"`
-	Uuid     uuid.UUID `json:"uuid" gorm:"type:uuid;unique"`
+	Uuid     uuid.UUID `json:"uuid" gorm:"type:uuid;uniqueIndex"`
 }
 
 func (b *Branch) BeforeDelete(tx *gorm.DB) error {
