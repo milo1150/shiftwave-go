@@ -19,17 +19,19 @@ func CreateReview(db *gorm.DB, payload *v1types.CreateReviewPayload) error {
 		return err
 	}
 
-	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchID: payload.Branch, Lang: *parseLang}).Error
+	return db.Create(&model.Review{Remark: payload.Remark, Score: payload.Score, BranchUUID: payload.Branch, Lang: *parseLang}).Error
 }
 
 func GetReviews(app *types.App, q *v1types.ReviewQueryParams, loc time.Location) (*v1types.ReviewsResponse, error) {
 	reviews := &[]model.Review{}
 
+	// Page
 	page := 1
 	if q.Page != nil {
 		page = *q.Page
 	}
 
+	// PageSize
 	pageSize := 10
 	if q.PageSize != nil {
 		pageSize = *q.PageSize
@@ -84,6 +86,9 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams, loc time.Location)
 		}
 	}
 
+	//Handle Branch
+	dbQuery = dbQuery.Where("branch_uuid = ?", q.Branch)
+
 	// Count
 	var totalItems int64
 	dbQuery.Model(&model.Review{}).Count(&totalItems)
@@ -93,7 +98,7 @@ func GetReviews(app *types.App, q *v1types.ReviewQueryParams, loc time.Location)
 	dbQuery = dbQuery.Limit(pageSize).Offset(offset)
 
 	// Preload Branch and execute query
-	if err := dbQuery.Preload("Branch").Order("id DESC").Find(reviews).Error; err != nil {
+	if err := dbQuery.Order("id DESC").Find(reviews).Error; err != nil {
 		return nil, err
 	}
 
@@ -131,6 +136,9 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 		return nil, fmt.Errorf("date_type is required")
 	}
 
+	// Add filter branch_uuid
+	dbQuery := db.Where("branch_uuid", q.Branch)
+
 	reviews := &[]model.Review{}
 
 	switch *q.DateType {
@@ -139,7 +147,7 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 			return nil, fmt.Errorf("start_date is required")
 		}
 
-		dateQuery, _ := getDateReviewsQuery(db, *q.StartDate, location)
+		dateQuery, _ := getDateReviewsQuery(dbQuery, *q.StartDate, location)
 		if err := dateQuery.Find(reviews).Error; err != nil {
 			return nil, err
 		}
@@ -149,7 +157,7 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 			return nil, fmt.Errorf("start_date and end_date are required")
 		}
 
-		dateRangeQuery, _ := getDateRangeReviewsQuery(db, *q.StartDate, *q.EndDate, location)
+		dateRangeQuery, _ := getDateRangeReviewsQuery(dbQuery, *q.StartDate, *q.EndDate, location)
 		if err := dateRangeQuery.Find(reviews).Error; err != nil {
 			return nil, err
 		}
@@ -159,7 +167,7 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 			return nil, fmt.Errorf("month and year are required")
 		}
 
-		monthQuery, _ := getMonthReviewsQuery(db, *q.Month, *q.Year, location)
+		monthQuery, _ := getMonthReviewsQuery(dbQuery, *q.Month, *q.Year, location)
 		if err := monthQuery.Find(reviews).Error; err != nil {
 			return nil, err
 		}
@@ -169,7 +177,7 @@ func GetAverageRating(db *gorm.DB, q *v1types.ReviewQueryParams, location time.L
 			return nil, fmt.Errorf("year is required")
 		}
 
-		yearQuery, _ := getYearReviewsQuery(db, *q.Year, location)
+		yearQuery, _ := getYearReviewsQuery(dbQuery, *q.Year, location)
 		if err := yearQuery.Find(reviews).Error; err != nil {
 			return nil, err
 		}

@@ -10,14 +10,14 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 )
 
 type GenerateRandomReviewsParams struct {
-	BranchId uint   `query:"branch_id" validate:"required,number"`
-	Lang     string `query:"lang" validate:"required,oneof=EN TH MY"` // always keep update enum with types.Lang
-	Count    int    `query:"count" validate:"required,min=1"`
+	Lang   string    `query:"lang" validate:"required,oneof=EN TH MY"` // always keep update enum with types.Lang
+	Count  int       `query:"count" validate:"required,min=1"`
+	Branch uuid.UUID `query:"branch" validate:"required,uuid"`
 }
 
 // Meme function
@@ -35,7 +35,7 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 	}
 
 	// Check is Branch existed
-	if err := app.DB.First(&model.Branch{Model: gorm.Model{ID: q.BranchId}}).Error; err != nil {
+	if err := app.DB.Model(&model.Branch{}).Where("uuid = ?", q.Branch).Error; err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
@@ -57,10 +57,10 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 		}
 
 		review := &model.Review{
-			Score:    uint(randomScore),
-			Remark:   remark,
-			BranchID: q.BranchId,
-			Lang:     *parseLang,
+			Score:      uint(randomScore),
+			Remark:     remark,
+			BranchUUID: q.Branch,
+			Lang:       *parseLang,
 		}
 
 		// Insert to DB

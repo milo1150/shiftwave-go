@@ -130,7 +130,7 @@ func UpdateUsers(db *gorm.DB, payloads *[]types.UpdateUserPayload) error {
 
 func GetAllAdminUsers(db *gorm.DB) ([]model.User, error) {
 	adminUsers := []model.User{}
-	if err := db.Debug().Where("role = ?", enum.RoleAdmin).Find(&adminUsers).Error; err != nil {
+	if err := db.Where("role = ?", enum.RoleAdmin).Find(&adminUsers).Error; err != nil {
 		return nil, err
 	}
 	return adminUsers, nil

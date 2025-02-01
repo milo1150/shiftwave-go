@@ -6,6 +6,7 @@ import (
 	"shiftwave-go/internal/connection"
 	"shiftwave-go/internal/enum"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -16,8 +17,11 @@ type Review struct {
 	Lang     enum.Lang `json:"lang" gorm:"default='TH'"`
 	RemarkEn string    `json:"remark_en"`
 
-	BranchID uint   `gorm:"not null"`                                       // Foreign key referencing the Branch model
-	Branch   Branch `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"` // One-to-One relationship
+	// Foreign key field, Use when WHERE branch_uuid = ?
+	BranchUUID uuid.UUID `gorm:"type:uuid;not null"`
+
+	// Explicit Foreign Key, One-to-One relationship, Use when Preload()
+	Branch Branch `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;foreignKey:BranchUUID;references:Uuid"`
 }
 
 func (r *Review) BeforeCreate(tx *gorm.DB) (err error) {

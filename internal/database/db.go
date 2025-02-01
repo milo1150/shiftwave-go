@@ -46,6 +46,24 @@ func migrateReviewTable(db *gorm.DB) {
 			log.Fatalf("Failed to update default lang column in Reviews table")
 		}
 	}
+
+	// Change relate between Review and Branch from ID to UUID
+	if db.Migrator().HasColumn(&model.Review{}, "branch_id") && db.Migrator().HasColumn(&model.Review{}, "branch_uuid") {
+		reviews := []model.Review{}
+		if err := db.Debug().Where("branch_id IS NOT NULL").Preload("Branch").Find(&reviews).Error; err != nil {
+			log.Fatalf("Failed to query reviews: %v", err)
+		}
+
+		for _, review := range reviews {
+			if err := db.Model(&review).Update("branch_uuid", review.Branch.Uuid).Error; err != nil {
+				log.Fatalf("Failed to update review branch_uuid: %v", err)
+			}
+		}
+
+		if err := db.Migrator().DropColumn(&model.Review{}, "branch_id"); err != nil {
+			log.Fatalf("Error Drop branch_id column in Review table: %v", err)
+		}
+	}
 }
 
 func migrateUserTable(db *gorm.DB) {
