@@ -49,13 +49,6 @@ func migrateReviewTable(db *gorm.DB) {
 }
 
 func migrateUserTable(db *gorm.DB) {
-	if db.Migrator().HasColumn(&model.User{}, "active_statue") {
-		err := db.Migrator().DropColumn(&model.User{}, "active_statue")
-		if err != nil {
-			log.Fatalf("Failed to drop column active_statue: %v.", err)
-		}
-	}
-
 	if db.Migrator().HasColumn(&model.User{}, "uuid") {
 		users := &[]model.User{}
 

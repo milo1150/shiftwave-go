@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	"shiftwave-go/internal/auth"
 	"shiftwave-go/internal/enum"
 	"shiftwave-go/internal/model"
@@ -124,5 +125,35 @@ func UpdateUsers(db *gorm.DB, payloads *[]types.UpdateUserPayload) error {
 			return errors.New("failed up update user branchres")
 		}
 	}
+	return nil
+}
+
+func GetAllAdminUsers(db *gorm.DB) ([]model.User, error) {
+	adminUsers := []model.User{}
+	if err := db.Debug().Where("role = ?", enum.RoleAdmin).Find(&adminUsers).Error; err != nil {
+		return nil, err
+	}
+	return adminUsers, nil
+}
+
+func UpdateAllAdminUserBranches(db *gorm.DB) error {
+	branches := []model.Branch{}
+	if err := db.Find(&branches).Error; err != nil {
+		return fmt.Errorf("failed to retrieve branches: %v", err)
+	}
+
+	admins, err := GetAllAdminUsers(db)
+	if err != nil {
+		return fmt.Errorf("failed to update admin user branches: %v", err)
+	}
+
+	if len(branches) > 0 && len(admins) > 0 {
+		for _, admin := range admins {
+			if err := db.Model(&admin).Association("Branches").Replace(branches); err != nil {
+				return fmt.Errorf("frror update admin user branches: %v", err)
+			}
+		}
+	}
+
 	return nil
 }

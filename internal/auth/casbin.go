@@ -55,6 +55,7 @@ func addPolicy(enforcer *casbin.Enforcer) {
 	enforcer.AddPolicy("user", "/v1/reviews")
 	enforcer.AddPolicy("user", "/v1/reviews/average-rating")
 	enforcer.AddPolicy("user", "/v1/reviews/sse")
+	enforcer.AddPolicy("user", "/v1/branches")
 }
 
 func removePolicy(enforcer *casbin.Enforcer) {

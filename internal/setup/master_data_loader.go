@@ -9,8 +9,10 @@ import (
 	"shiftwave-go/internal/auth"
 	"shiftwave-go/internal/model"
 	"shiftwave-go/internal/types"
+	v1repo "shiftwave-go/internal/v1/repository"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -57,7 +59,7 @@ func insertBranchesIntoDB(db *gorm.DB, branchJsons []types.BranchMasterData) {
 
 	for _, branch := range branchJsons {
 		if _, existed := check[branch.Name]; !existed {
-			if err := db.Create(&model.Branch{Name: branch.Name}).Error; err != nil {
+			if err := db.Create(&model.Branch{Name: branch.Name, Uuid: uuid.New(), IsActive: true}).Error; err != nil {
 				log.Fatalf("Failed to inserted %v into Branch table: %v", branch.Name, err)
 			} else {
 				log.Printf("Inserted %v into Branch table.", branch.Name)
@@ -105,4 +107,8 @@ func MasterDataLoader(app *types.App) {
 	insertBranchesIntoDB(app.DB, masterDataJson.Branches)
 
 	insertUserIntoDB(app.DB, masterDataJson.Users, app.ENV.AdminPassword)
+
+	if err := v1repo.UpdateAllAdminUserBranches(app.DB); err != nil {
+		log.Fatalf("Error UpdateAdminUserBranches: %v", err.Error())
+	}
 }
