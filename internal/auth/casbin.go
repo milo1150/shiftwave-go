@@ -52,6 +52,7 @@ func addPolicy(enforcer *casbin.Enforcer) {
 	enforcer.AddPolicy("admin", "/v1/user/update-users")
 
 	// Role - User
+	enforcer.AddPolicy("user", "/v1/user/user-profile")
 	enforcer.AddPolicy("user", "/v1/reviews")
 	enforcer.AddPolicy("user", "/v1/reviews/average-rating")
 	enforcer.AddPolicy("user", "/v1/reviews/sse")
