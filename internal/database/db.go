@@ -47,13 +47,6 @@ func migrateReviewTable(db *gorm.DB) {
 		}
 	}
 
-	// Change relate between Review and Branch from ID to UUID
-	if !db.Migrator().HasColumn(&model.Review{}, "branch_uuid") {
-		if err := db.Migrator().AddColumn(&model.Review{}, "branch_uuid"); err != nil {
-			log.Fatalf("Failed to add column branch_uuid in review table: %v", err.Error())
-		}
-	}
-
 	if db.Migrator().HasColumn(&model.Review{}, "branch_id") && db.Migrator().HasColumn(&model.Review{}, "branch_uuid") {
 		reviews := []model.Review{}
 		if err := db.Model(&model.Review{}).Where("branch_uuid IS NULL").Find(&reviews).Error; err != nil {
