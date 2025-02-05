@@ -28,8 +28,10 @@ services:
       retries: 5
   app:
     build:
-      context: ..
-      dockerfile: ./deployments/Dockerfile.production
+      # context: ..
+      # dockerfile: ./deployments/Dockerfile.production
+      context: .
+      dockerfile: Dockerfile.production
     container_name: go-app-prd
     depends_on:
       postgres:
