@@ -17,7 +17,8 @@ RUN go mod download && go mod tidy && go mod verify
 COPY . .
 
 # Run Staticcheck to check the code
-RUN staticcheck ./...
+# this line take 150.8s to finish on Intel Xeon Processor (Skylake, IBRS, no TSX) 2 Cores
+# RUN staticcheck ./... 
 
 # Build the binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main .
