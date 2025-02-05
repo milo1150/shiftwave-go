@@ -29,7 +29,7 @@ services:
   app:
     build:
       context: ..
-      dockerfile: deployments/Dockerfile.production
+      dockerfile: ./deployments/Dockerfile.production
     container_name: go-app-prd
     depends_on:
       postgres:
