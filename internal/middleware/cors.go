@@ -10,7 +10,6 @@ func ConfigCORS() echo.MiddlewareFunc {
 		AllowOrigins: []string{"http://localhost:4321",
 			"https://be-shiftwave-dev.mijio.app",
 			"https://shiftwave-dev.mijio.app",
-			"https://be-shiftwave-dev.mijio.app:8081",
 		},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	})

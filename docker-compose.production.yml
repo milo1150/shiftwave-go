@@ -28,8 +28,6 @@ services:
       retries: 5
   app:
     build:
-      # context: ..
-      # dockerfile: ./deployments/Dockerfile.production
       context: .
       dockerfile: Dockerfile.production
     container_name: go-app-prd
@@ -38,8 +36,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    ports:
-      - '8081:8080'
+    # ports:
+    #   - '8081:8080'
+    expose:
+      - '8081'
     env_file:
       - .env
     working_dir: /app
