@@ -60,8 +60,6 @@ func insertBranchesIntoDB(db *gorm.DB, branchJsons []types.BranchMasterData) {
 		if _, existed := check[branch.Name]; !existed {
 			if err := db.Create(&model.Branch{Name: branch.Name, Uuid: uuid.New(), IsActive: true}).Error; err != nil {
 				log.Fatalf("Failed to inserted %v into Branch table: %v", branch.Name, err)
-			} else {
-				log.Printf("Inserted %v into Branch table.", branch.Name)
 			}
 		}
 	}
@@ -89,8 +87,6 @@ func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData, adminPasswo
 			result := db.Create(&model.User{Username: userJson.Username, Role: userJson.Role, Password: hashPassword})
 			if err := result.Error; err != nil {
 				log.Fatalf("Failed to inserted %v into User table: %v", userJson.Username, err)
-			} else {
-				log.Printf("Inserted %v into User table.", userJson.Username)
 			}
 		}
 	}
