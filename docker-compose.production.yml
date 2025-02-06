@@ -44,3 +44,4 @@ services:
 
 volumes:
   postgres-data-prd:
+    external: true
