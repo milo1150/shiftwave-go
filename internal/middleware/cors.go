@@ -9,7 +9,6 @@ func ConfigCORS() echo.MiddlewareFunc {
 	config := middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{
 			"http://localhost:4321",
-			"https://be-shiftwave-dev.mijio.app/",
 			"https://shiftwave-dev.mijio.app/",
 		},
 		AllowHeaders: []string{

@@ -2,7 +2,6 @@ package setup
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -86,8 +85,6 @@ func insertUserIntoDB(db *gorm.DB, userJsons []types.UserMasterData, adminPasswo
 			if err != nil {
 				log.Fatalf("Failed to hash admin password")
 			}
-
-			fmt.Println(adminPassword, hashPassword)
 
 			result := db.Create(&model.User{Username: userJson.Username, Role: userJson.Role, Password: hashPassword})
 			if err := result.Error; err != nil {

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"shiftwave-go/internal/model"
 
@@ -120,8 +119,6 @@ func InitDatabase() *gorm.DB {
 	if err != nil {
 		log.Fatalf("Failed to migrate db.")
 	}
-
-	fmt.Println("Connected to PostgreSQL using GORM!")
 
 	return db
 }
