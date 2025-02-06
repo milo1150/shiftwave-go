@@ -49,7 +49,7 @@ COPY internal/resources/master_data.json ./internal/resources/
 RUN chmod +x ./main
 
 # Expose port if necessary
-EXPOSE 8081
+EXPOSE 8080
 
 # Run the binary
 CMD ["./main"]
