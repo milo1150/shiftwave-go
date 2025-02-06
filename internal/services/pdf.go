@@ -45,12 +45,12 @@ func SetupFont() *entity.Config {
 	return cfg
 }
 
-func GenerateReviewQRcode(baseUrl string, branchUuid uuid.UUID) core.Maroto {
+func GenerateReviewQRcode(appUrl string, branchUuid uuid.UUID) core.Maroto {
 	m := maroto.New()
 
-	thUrl := fmt.Sprintf("%s/th/reviews?branch_id=%d", baseUrl, branchUuid)
-	enUrl := fmt.Sprintf("%s/en/reviews?branch_id=%d", baseUrl, branchUuid)
-	myUrl := fmt.Sprintf("%s/my/reviews?branch_id=%d", baseUrl, branchUuid)
+	thUrl := fmt.Sprintf("%s/th/reviews?branch_id=%s", appUrl, branchUuid.String())
+	enUrl := fmt.Sprintf("%s/en/reviews?branch_id=%s", appUrl, branchUuid.String())
+	myUrl := fmt.Sprintf("%s/my/reviews?branch_id=%s", appUrl, branchUuid.String())
 
 	thText := "Please provide feedback (Thai)"
 	enText := "Please provide feedback (English)"

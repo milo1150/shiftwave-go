@@ -31,7 +31,7 @@ func GenerateQRCodeHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, "Invalid uuid")
 	}
 
-	m := services.GenerateReviewQRcode(os.Getenv("BASE_URL"), q.BranchUuid)
+	m := services.GenerateReviewQRcode(os.Getenv("APP_URL"), q.BranchUuid)
 
 	document, err := m.Generate()
 	if err != nil {
