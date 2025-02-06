@@ -147,7 +147,7 @@ func InitializeOpenAiTranslateScheduler(app *types.App) {
 		// TODO: change to run every hour
 		// gocron.OneTimeJob(gocron.OneTimeJobStartImmediately()),
 		gocron.DurationJob(
-			5*time.Second,
+			10*time.Second,
 		),
 		gocron.NewTask(
 			func() {
