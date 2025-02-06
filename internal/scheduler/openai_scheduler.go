@@ -110,8 +110,11 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 			})),
 		})),
 	})
+
+	// Prevent nil pointer dereference
 	if err != nil {
 		log.Printf("Error from OpenAI: %v \n", err.Error())
+		return
 	}
 
 	// Log result
@@ -125,6 +128,7 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	// Update data in Review table with the translated result
 	if err := v1repo.UpdateReviewsFromTranslateResult(app.DB, parseResponse.Results); err != nil {
 		log.Printf("Error update review table: %v. \n", err)
+		return
 	}
 
 	// Check func is ok
