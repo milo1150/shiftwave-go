@@ -11,6 +11,12 @@ func ConfigCORS() echo.MiddlewareFunc {
 			"http://localhost:4321",
 			"https://shiftwave-dev.mijio.app/",
 		},
+		// Do not allow delete beacuse we don't delete data here.
+		AllowMethods: []string{
+			echo.GET,
+			echo.POST,
+			echo.PATCH,
+		},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
 			echo.HeaderContentType,
