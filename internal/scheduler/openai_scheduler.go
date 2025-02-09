@@ -85,7 +85,6 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 
 	// Initialize OpenAI Client
 	var client *openai.Client
-	fmt.Println("hello:", app.ENV.APP_ENV, client)
 	if app.ENV.APP_ENV == "development" {
 		client = openai.NewClient(
 			option.WithAPIKey(app.ENV.OpenAI),
@@ -95,6 +94,7 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	// Error from OpenAI: Post "https://api.openai.com/v1/chat/completions": tls: failed to verify certificate: x509: certificate signed by unknown authority
 	if app.ENV.APP_ENV == "production" {
 		cert := network.LoadCertificate()
+		fmt.Println("c:", cert)
 		httpClient := network.GetHttpClientWithCert(cert)
 		client = openai.NewClient(
 			option.WithAPIKey(app.ENV.OpenAI),
@@ -106,6 +106,9 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 		log.Printf("Failed to initial openai client")
 		return
 	}
+
+	// TODO: enable
+	return
 
 	// Send request to OpenAI
 	chatCompletion, err := client.Chat.Completions.New(app.Context, openai.ChatCompletionNewParams{

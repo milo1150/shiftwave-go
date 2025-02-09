@@ -2,6 +2,7 @@ package network
 
 import (
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,7 +18,11 @@ func LoadCertificate() tls.Certificate {
 
 	certFile := os.Getenv("CERT_FILE_PATH")
 	keyFile := os.Getenv("KEY_FILE_PATH")
+	// TODO: delete
+	fmt.Println("c file:", certFile, "k file:", keyFile)
 	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	// TODO: delete
+	fmt.Println("ct:", cert)
 	if err != nil {
 		log.Fatalf("Error load certificate: %v", err)
 	}
