@@ -87,7 +87,7 @@ func reviewRoute(e *echo.Echo, app *types.App) {
 	reviewGroup := e.Group("/v1/review")
 
 	reviewGroup.POST("", func(c echo.Context) error {
-		return CreateReviewHandler(c, app.DB)
+		return CreateReviewHandler(c, app.DB, app.RDB)
 	}, middleware.IpRateLimiterMiddleware(app.RDB, 1))
 
 	e.GET("/v1/review/limit", func(c echo.Context) error {

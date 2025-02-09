@@ -7,6 +7,7 @@ import (
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
 	v1dto "shiftwave-go/internal/v1/dto"
+	v1repo "shiftwave-go/internal/v1/repository"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/go-playground/validator/v10"
@@ -32,6 +33,11 @@ func GenerateRandomReviews(c echo.Context, app *types.App) error {
 		validationErrors := err.(validator.ValidationErrors)
 		errorMessagees := utils.ExtractErrorMessages(validationErrors)
 		return c.JSON(http.StatusBadRequest, errorMessagees)
+	}
+
+	// Check is valid branch uuid
+	if _, err := v1repo.FindBranchByUUID(app.DB, q.Branch); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Invalid branch id"})
 	}
 
 	// Check is Branch existed

@@ -10,7 +10,7 @@ import (
 	"shiftwave-go/internal/middleware"
 	"shiftwave-go/internal/types"
 	"shiftwave-go/internal/utils"
-	v1repository "shiftwave-go/internal/v1/repository"
+	v1repo "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
 	"strconv"
 	"time"
@@ -22,7 +22,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateReviewHandler(c echo.Context, db *gorm.DB) error {
+func CreateReviewHandler(c echo.Context, db *gorm.DB, rdb *redis.Client) error {
 	payload := new(v1types.CreateReviewPayload)
 	if err := c.Bind(payload); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
@@ -35,8 +35,21 @@ func CreateReviewHandler(c echo.Context, db *gorm.DB) error {
 		return c.JSON(http.StatusBadRequest, errorMessagees)
 	}
 
-	if result := v1repository.CreateReview(db, payload); result != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": result.Error()})
+	// Check is valid branch uuid
+	if _, err := v1repo.FindBranchByUUID(db, payload.Branch); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Invalid branch id"})
+	}
+
+	// Create Review
+	if err := v1repo.CreateReview(db, payload); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	// Increment Redis rate limit counting
+	if err := middleware.IncreaseIpCounting(c, rdb); err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{
+			"error": err.Error(),
+		})
 	}
 
 	return c.JSON(http.StatusOK, http.StatusOK)
@@ -55,7 +68,7 @@ func GetReviewsHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
 
-	result, err := v1repository.GetReviews(app, q, *app.ENV.LocalTimezone)
+	result, err := v1repo.GetReviews(app, q, *app.ENV.LocalTimezone)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 	}
@@ -71,7 +84,7 @@ func GetReviewHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, "Invalid param")
 	}
 
-	result, _ := v1repository.GetReview(app, id)
+	result, _ := v1repo.GetReview(app, id)
 
 	return c.JSON(http.StatusOK, result)
 }
@@ -89,7 +102,7 @@ func GetAverageRatingHandler(c echo.Context, app *types.App) error {
 		return c.JSON(http.StatusBadRequest, errorMessages)
 	}
 
-	result, err := v1repository.GetAverageRating(app.DB, q, *app.ENV.LocalTimezone)
+	result, err := v1repo.GetAverageRating(app.DB, q, *app.ENV.LocalTimezone)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

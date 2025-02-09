@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"shiftwave-go/internal/database"
+	"strconv"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -41,28 +42,37 @@ func IpRateLimiterMiddleware(rdb *redis.Client, limit uint64) echo.MiddlewareFun
 			ip := c.RealIP()
 			key := database.GetRateLimitKey(ip, today)
 
-			// Increment request count
-			count, err := rdb.Incr(c.Request().Context(), key).Result()
-			if err != nil {
-				fmt.Println(err)
-				return c.JSON(http.StatusInternalServerError, map[string]string{
-					"error": "Unable to process request",
-				})
-			}
+			countStr, _ := rdb.Get(c.Request().Context(), key).Result()
+			count, _ := strconv.ParseInt(countStr, 10, 64)
 
-			// Set TTL (Time To Live) for key if it's the first request today
-			if count >= 1 {
-				rdb.Expire(c.Request().Context(), key, 1*time.Hour)
-			}
+			if count > 0 {
+				// Set TTL (Time To Live) for key if it's the first request today
+				if count >= 1 {
+					rdb.Expire(c.Request().Context(), key, 1*time.Hour)
+				}
 
-			// Check if the IP exceeded the daily limit
-			if count > int64(limit) {
-				return c.JSON(http.StatusTooManyRequests, map[string]string{
-					"error": "Rate limit exceed. Try again tomorrow.",
-				})
+				// Check if the IP exceeded the daily limit
+				if count >= int64(limit) {
+					return c.JSON(http.StatusTooManyRequests, map[string]string{
+						"error": "Rate limit exceed. Try again tomorrow.",
+					})
+				}
 			}
 
 			return next(c)
 		}
 	}
+}
+
+func IncreaseIpCounting(c echo.Context, rdb *redis.Client) error {
+	today := time.Now().Format(time.DateOnly)
+	ip := c.RealIP()
+	key := database.GetRateLimitKey(ip, today)
+
+	_, err := rdb.Incr(c.Request().Context(), key).Result()
+	if err != nil {
+		return errors.New("unable to process request")
+	}
+
+	return nil
 }
