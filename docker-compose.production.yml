@@ -43,6 +43,8 @@ services:
     working_dir: /app
     volumes:
       - ${HOST_CERT_FOLDER_PATH}:${APP_CERT_FOLDER_PATH}:ro
+      - ${HOST_CERT_FOLDER_PATH}/shiftwave-dev-b.mijio.app.crt:${APP_CERT_FILE_PATH}:ro
+      - ${HOST_CERT_FOLDER_PATH}/shiftwave-dev-b.mijio.app.key:${APP_CERT_KEY_PATH}:ro
 
 volumes:
   postgres-data-prd:
