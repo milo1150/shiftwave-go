@@ -3,6 +3,8 @@
 # Build stage
 FROM golang:1.23 AS builder
 
+RUN apt-get update && apt-get install -y ca-certificates
+
 # Set the working directory
 WORKDIR /app
 

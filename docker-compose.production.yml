@@ -41,8 +41,6 @@ services:
     env_file:
       - .env
     working_dir: /app
-    volumes:
-      - ${HOST_CERT_DIRECTORY}:${APP_CERT_DIRECTORY}:ro
 
 volumes:
   postgres-data-prd:

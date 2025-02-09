@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"shiftwave-go/internal/enum"
-	"shiftwave-go/internal/network"
 	"shiftwave-go/internal/types"
 	v1repo "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
@@ -93,12 +92,8 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	// NOTE: If not TLS
 	// Error from OpenAI: Post "https://api.openai.com/v1/chat/completions": tls: failed to verify certificate: x509: certificate signed by unknown authority
 	if app.ENV.APP_ENV == "production" {
-		cert := network.LoadCertificate()
-		fmt.Println("c:", cert)
-		httpClient := network.GetHttpClientWithCert(cert)
 		client = openai.NewClient(
 			option.WithAPIKey(app.ENV.OpenAI),
-			option.WithHTTPClient(httpClient),
 		)
 	}
 
@@ -106,9 +101,6 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 		log.Printf("Failed to initial openai client")
 		return
 	}
-
-	// TODO: enable
-	return
 
 	// Send request to OpenAI
 	chatCompletion, err := client.Chat.Completions.New(app.Context, openai.ChatCompletionNewParams{
