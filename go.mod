@@ -10,13 +10,14 @@ require (
 	github.com/go-co-op/gocron/v2 v2.14.2
 	github.com/go-playground/validator/v10 v10.24.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/johnfercher/maroto/v2 v2.2.2
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo-jwt/v4 v4.3.0
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/openai/openai-go v0.1.0-alpha.45
+	github.com/openai/openai-go v0.1.0-alpha.56
 	github.com/redis/go-redis/v9 v9.7.0
 	github.com/swaggo/echo-swagger v1.4.1
 	github.com/swaggo/swag v1.16.4
@@ -24,7 +25,6 @@ require (
 	golang.org/x/time v0.9.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
-	github.com/davecgh/go-spew v1.1.1
 )
 
 require (
@@ -33,6 +33,7 @@ require (
 	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/casbin/govaluate v1.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/f-amaral/go-async v0.3.0 // indirect
@@ -49,7 +50,6 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect
 	github.com/hhrutter/tiff v1.0.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

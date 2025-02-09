@@ -17,6 +17,13 @@ func EnvLoader() types.Env {
 		log.Fatalf("Error loading env")
 	}
 
+	// APP ENV
+	appEnv := os.Getenv("APP_ENV")
+	if err != nil {
+		log.Fatalf("Error loading app env: %v", err)
+	}
+	env.APP_ENV = appEnv
+
 	// Location timezone
 	location, err := time.LoadLocation(os.Getenv("LOCAL_TIMEZONE"))
 	if err != nil {

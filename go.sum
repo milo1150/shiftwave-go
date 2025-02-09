@@ -168,8 +168,8 @@ github.com/microsoft/go-mssqldb v1.6.0 h1:mM3gYdVwEPFrlg/Dvr2DNVEgYFG7L42l+dGc67
 github.com/microsoft/go-mssqldb v1.6.0/go.mod h1:00mDtPbeQCRGC1HwOOR5K/gr30P1NcEG0vx6Kbv2aJU=
 github.com/modocache/gover v0.0.0-20171022184752-b58185e213c5/go.mod h1:caMODM3PzxT8aQXRPkAt8xlV/e7d7w8GM5g0fa5F0D8=
 github.com/montanaflynn/stats v0.7.0/go.mod h1:etXPPgVO6n31NxCd9KQUMvCM+ve0ruNzt6R8Bnaayow=
-github.com/openai/openai-go v0.1.0-alpha.45 h1:PAj4Rj+ofOIh9ziT56FaTqb0as6PoUfbKPIvlUAOy6M=
-github.com/openai/openai-go v0.1.0-alpha.45/go.mod h1:3SdE6BffOX9HPEQv8IL/fi3LYZ5TUpRYaqGQZbyk11A=
+github.com/openai/openai-go v0.1.0-alpha.56 h1:wKKsyVUi6ppZ8WRL+PC+tOB67alvJjfEWkC3Lc9YnqU=
+github.com/openai/openai-go v0.1.0-alpha.56/go.mod h1:3SdE6BffOX9HPEQv8IL/fi3LYZ5TUpRYaqGQZbyk11A=
 github.com/pdfcpu/pdfcpu v0.6.0 h1:z4kARP5bcWa39TTYMcN/kjBnm7MvhTWjXgeYmkdAGMI=
 github.com/pdfcpu/pdfcpu v0.6.0/go.mod h1:kmpD0rk8YnZj0l3qSeGBlAB+XszHUgNv//ORH/E7EYo=
 github.com/phpdave11/gofpdi v1.0.7/go.mod h1:vBmVV0Do6hSBHC8uKUQ71JGW+ZGQq74llk/7bXwjDoI=

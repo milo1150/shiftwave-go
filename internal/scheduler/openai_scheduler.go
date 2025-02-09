@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"shiftwave-go/internal/enum"
+	"shiftwave-go/internal/network"
 	"shiftwave-go/internal/types"
 	v1repo "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
@@ -59,6 +60,7 @@ func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.Us
 
 func translateAndUpdateMyanmarReviews(app *types.App) {
 	// Get TranslateMessages
+	// If query length = 0, then do nothing.
 	assistantMessage, userMessage, err := getTranslateMessage(app)
 	if err != nil {
 		log.Printf("no query data needed for translate to MY")
@@ -66,17 +68,44 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	}
 
 	// Parse JSON to String
-	assistantMessageString, _ := json.Marshal(assistantMessage)
-	userMessageString, _ := json.Marshal(userMessage)
+	assistantMessageString, err := json.Marshal(assistantMessage)
+	if err != nil {
+		log.Printf("Error marshal assistantMessage")
+		return
+	}
+	userMessageString, err := json.Marshal(userMessage)
+	if err != nil {
+		log.Printf("Error marshal userMessage")
+		return
+	}
 
 	// Log message
 	log.Println("assistantMessageString: ", string(assistantMessageString))
 	log.Println("userMessageString: ", string(userMessageString))
 
 	// Initialize OpenAI Client
-	client := openai.NewClient(
-		option.WithAPIKey(app.ENV.OpenAI),
-	)
+	var client *openai.Client
+	fmt.Println("hello:", app.ENV.APP_ENV, client)
+	if app.ENV.APP_ENV == "development" {
+		client = openai.NewClient(
+			option.WithAPIKey(app.ENV.OpenAI),
+		)
+	}
+	// NOTE: If not TLS
+	// Error from OpenAI: Post "https://api.openai.com/v1/chat/completions": tls: failed to verify certificate: x509: certificate signed by unknown authority
+	if app.ENV.APP_ENV == "production" {
+		cert := network.LoadCertificate()
+		httpClient := network.GetHttpClientWithCert(cert)
+		client = openai.NewClient(
+			option.WithAPIKey(app.ENV.OpenAI),
+			option.WithHTTPClient(httpClient),
+		)
+	}
+
+	if client == nil {
+		log.Printf("Failed to initial openai client")
+		return
+	}
 
 	// Send request to OpenAI
 	chatCompletion, err := client.Chat.Completions.New(app.Context, openai.ChatCompletionNewParams{
