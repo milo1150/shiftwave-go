@@ -25,6 +25,7 @@ require (
 	golang.org/x/time v0.9.0
 	gorm.io/driver/postgres v1.5.11
 	gorm.io/gorm v1.25.12
+	github.com/sashabaranov/go-openai v1.37.0
 )
 
 require (

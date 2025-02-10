@@ -4,17 +4,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"shiftwave-go/internal/enum"
-	"shiftwave-go/internal/network"
-	"shiftwave-go/internal/types"
-	v1repo "shiftwave-go/internal/v1/repository"
-	v1types "shiftwave-go/internal/v1/types"
 	"strconv"
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
+
+	"shiftwave-go/internal/enum"
+	"shiftwave-go/internal/types"
+	v1repo "shiftwave-go/internal/v1/repository"
+	v1types "shiftwave-go/internal/v1/types"
+
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
+
+	openaiV2 "github.com/sashabaranov/go-openai"
+	"github.com/sashabaranov/go-openai/jsonschema"
 )
 
 const PROVIDE_LANG = "Burmese"
@@ -58,7 +62,7 @@ func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.Us
 	return assistantMessage, userMessage, nil
 }
 
-func translateAndUpdateMyanmarReviews(app *types.App) {
+func translateAndUpdateMyanmarReviewsV2(app *types.App) {
 	// Get TranslateMessages
 	// If query length = 0, then do nothing.
 	assistantMessage, userMessage, err := getTranslateMessage(app)
@@ -84,48 +88,105 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	log.Println("userMessageString: ", string(userMessageString))
 
 	// Initialize OpenAI Client
-	var client *openai.Client
-	if app.ENV.APP_ENV == "development" {
-		client = openai.NewClient(
-			option.WithAPIKey(app.ENV.OpenAI),
-		)
+	client := openaiV2.NewClient(app.ENV.OpenAI)
+
+	// Define the expected result structure
+	type Result struct {
+		Results []struct {
+			ID   string `json:"id"`
+			Text string `json:"text"`
+		} `json:"results"`
 	}
-	// NOTE: If not TLS
-	// Error from OpenAI: Post "https://api.openai.com/v1/chat/completions": tls: failed to verify certificate: x509: certificate signed by unknown authority
-	if app.ENV.APP_ENV == "production" {
-		cert := network.LoadCertificate()
-		httpClient := network.GetHttpClientWithCert(cert)
-		client = openai.NewClient(
-			option.WithAPIKey(app.ENV.OpenAI),
-			option.WithHTTPClient(httpClient),
-		)
+	var result Result
+
+	// Generate JSON schema for the expected result structure
+	schema, err := jsonschema.GenerateSchemaForType(result)
+	if err != nil {
+		log.Fatalf("GenerateSchemaForType error: %v", err)
 	}
-	// if app.ENV.APP_ENV == "production" {
-	// 	// Load system's root CA certificates
-	// 	caCertPool, err := x509.SystemCertPool()
-	// 	if err != nil || caCertPool == nil {
-	// 		caCertPool = x509.NewCertPool() // Fallback to an empty cert pool
-	// 	}
 
-	// 	// Create a custom TLS configuration
-	// 	tlsConfig := &tls.Config{
-	// 		RootCAs: caCertPool,
-	// 	}
+	// Send request to OpenAI
+	chatCompletion, err := client.CreateChatCompletion(
+		app.Context,
+		openaiV2.ChatCompletionRequest{
+			Model: openaiV2.GPT4oMini,
+			Messages: []openaiV2.ChatCompletionMessage{
+				{
+					Role:    openaiV2.ChatMessageRoleUser,
+					Content: string(userMessageString),
+				},
+				{
+					Role:    openaiV2.ChatMessageRoleAssistant,
+					Content: string(assistantMessageString),
+				},
+			},
+			ResponseFormat: &openaiV2.ChatCompletionResponseFormat{
+				Type: openaiV2.ChatCompletionResponseFormatTypeJSONSchema,
+				JSONSchema: &openaiV2.ChatCompletionResponseFormatJSONSchema{
+					Name:   "translate_burmese_to_english",
+					Strict: true,
+					Schema: schema,
+				},
+			},
+		},
+	)
 
-	// 	// Use the custom TLS config in your HTTP client
-	// 	transport := &http.Transport{TLSClientConfig: tlsConfig}
-	// 	tlsClient := &http.Client{Transport: transport}
-
-	// 	client = openai.NewClient(
-	// 		option.WithAPIKey(app.ENV.OpenAI),
-	// 		option.WithHTTPClient(tlsClient),
-	// 	)
-	// }
-
-	if client == nil {
-		log.Printf("Failed to initial openai client")
+	// Prevent nil pointer dereference
+	if err != nil {
+		log.Printf("Error from OpenAI: %v \n", err.Error())
 		return
 	}
+
+	// Log result
+	log.Printf("TotalTokens: %v, PromptTokens: %v, CompletionTokens: %v \n", chatCompletion.Usage.TotalTokens, chatCompletion.Usage.PromptTokens, chatCompletion.Usage.CompletionTokens)
+	log.Println(chatCompletion.Choices[0].Message.Content)
+
+	// Parse results to struct
+	var parseResponse v1types.TranslateResponse
+	json.Unmarshal([]byte(chatCompletion.Choices[0].Message.Content), &parseResponse)
+
+	// Update data in Review table with the translated result
+	if err := v1repo.UpdateReviewsFromTranslateResult(app.DB, parseResponse.Results); err != nil {
+		log.Printf("Error update review table: %v. \n", err)
+		return
+	}
+
+	// Check func is ok
+	log.Println("translateAndUpdateMyanmarReviewsV2 Done !!!")
+}
+
+// NOTE
+// Local - Work fine
+// Prod - Error from OpenAI: Post "https://api.openai.com/v1/chat/completions": tls: failed to verify certificate: x509: certificate signed by unknown authority
+func TranslateAndUpdateMyanmarReviews(app *types.App) {
+	// Get TranslateMessages
+	// If query length = 0, then do nothing.
+	assistantMessage, userMessage, err := getTranslateMessage(app)
+	if err != nil {
+		log.Printf("no query data needed for translate to MY")
+		return
+	}
+
+	// Parse JSON to String
+	assistantMessageString, err := json.Marshal(assistantMessage)
+	if err != nil {
+		log.Printf("Error marshal assistantMessage")
+		return
+	}
+	userMessageString, err := json.Marshal(userMessage)
+	if err != nil {
+		log.Printf("Error marshal userMessage")
+		return
+	}
+
+	// Log message
+	log.Println("assistantMessageString: ", string(assistantMessageString))
+	log.Println("userMessageString: ", string(userMessageString))
+
+	// Initialize OpenAI Client
+	client := openai.NewClient(
+		option.WithAPIKey(app.ENV.OpenAI),
+	)
 
 	// Send request to OpenAI
 	chatCompletion, err := client.Chat.Completions.New(app.Context, openai.ChatCompletionNewParams{
@@ -200,7 +261,7 @@ func InitializeOpenAiTranslateScheduler(app *types.App) {
 		),
 		gocron.NewTask(
 			func() {
-				translateAndUpdateMyanmarReviews(app)
+				translateAndUpdateMyanmarReviewsV2(app)
 			},
 		),
 	)
