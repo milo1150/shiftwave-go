@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -80,10 +79,10 @@ func GetOpenAIClient(apiKey string) *openai.Client {
 	}
 
 	// Create custom HTTP transport
-	proxyURL, _ := url.Parse("https://shiftwave-dev-b.mijio.app:8080")
+	// proxyURL, _ := url.Parse("https://shiftwave-dev-b.mijio.app:8080")
 	transport := &http.Transport{
 		TLSClientConfig: tlsConfig,
-		Proxy:           http.ProxyURL(proxyURL),
+		// Proxy:           http.ProxyURL(proxyURL),
 	}
 
 	// Create HTTP client
