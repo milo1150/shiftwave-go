@@ -1,13 +1,11 @@
 package scheduler
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"log"
-	"net/http"
 	"shiftwave-go/internal/enum"
+	"shiftwave-go/internal/network"
 	"shiftwave-go/internal/types"
 	v1repo "shiftwave-go/internal/v1/repository"
 	v1types "shiftwave-go/internal/v1/types"
@@ -95,26 +93,34 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 	// NOTE: If not TLS
 	// Error from OpenAI: Post "https://api.openai.com/v1/chat/completions": tls: failed to verify certificate: x509: certificate signed by unknown authority
 	if app.ENV.APP_ENV == "production" {
-		// Load system's root CA certificates
-		caCertPool, err := x509.SystemCertPool()
-		if err != nil || caCertPool == nil {
-			caCertPool = x509.NewCertPool() // Fallback to an empty cert pool
-		}
-
-		// Create a custom TLS configuration
-		tlsConfig := &tls.Config{
-			RootCAs: caCertPool,
-		}
-
-		// Use the custom TLS config in your HTTP client
-		transport := &http.Transport{TLSClientConfig: tlsConfig}
-		tlsClient := &http.Client{Transport: transport}
-
+		cert := network.LoadCertificate()
+		httpClient := network.GetHttpClientWithCert(cert)
 		client = openai.NewClient(
 			option.WithAPIKey(app.ENV.OpenAI),
-			option.WithHTTPClient(tlsClient),
+			option.WithHTTPClient(httpClient),
 		)
 	}
+	// if app.ENV.APP_ENV == "production" {
+	// 	// Load system's root CA certificates
+	// 	caCertPool, err := x509.SystemCertPool()
+	// 	if err != nil || caCertPool == nil {
+	// 		caCertPool = x509.NewCertPool() // Fallback to an empty cert pool
+	// 	}
+
+	// 	// Create a custom TLS configuration
+	// 	tlsConfig := &tls.Config{
+	// 		RootCAs: caCertPool,
+	// 	}
+
+	// 	// Use the custom TLS config in your HTTP client
+	// 	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	// 	tlsClient := &http.Client{Transport: transport}
+
+	// 	client = openai.NewClient(
+	// 		option.WithAPIKey(app.ENV.OpenAI),
+	// 		option.WithHTTPClient(tlsClient),
+	// 	)
+	// }
 
 	if client == nil {
 		log.Printf("Failed to initial openai client")
