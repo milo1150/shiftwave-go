@@ -110,7 +110,7 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 		// tlsClient := &http.Client{Transport: transport}
 
 		// Proxy
-		proxyURL, _ := url.Parse("https://shiftwave-dev-b.mijio.app:8080")
+		proxyURL, _ := url.Parse("https://shiftwave-dev-b.mijio.app")
 		transport := &http.Transport{Proxy: http.ProxyURL(proxyURL)}
 		tlsClient := &http.Client{Transport: transport}
 
