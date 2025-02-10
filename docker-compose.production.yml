@@ -42,7 +42,8 @@ services:
       - .env
     working_dir: /app
     volumes:
-      - ${HOST_CERT_DIRECTORY}:${APP_CERT_DIRECTORY}:ro
+      # - ${HOST_CERT_DIRECTORY}:${APP_CERT_DIRECTORY}:ro
+      - /data/coolify/proxy/caddy/data/caddy/certificates/acme-v02.api.letsencrypt.org-directory/shiftwave-dev-b.mijio.app:/app/ssl/certs:ro
 
 volumes:
   postgres-data-prd:
