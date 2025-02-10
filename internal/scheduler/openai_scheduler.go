@@ -1,9 +1,12 @@
 package scheduler
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -62,7 +65,38 @@ func getTranslateMessage(app *types.App) (*v1types.AssistantMessage, *v1types.Us
 	return assistantMessage, userMessage, nil
 }
 
-func translateAndUpdateMyanmarReviewsV2(app *types.App) {
+func GetOpenAIClient(apiKey string) *openai.Client {
+	// Load system certificates
+	caCertPool, err := x509.SystemCertPool()
+	if err != nil || caCertPool == nil {
+		caCertPool = x509.NewCertPool()
+	}
+
+	// Create custom TLS configuration
+	tlsConfig := &tls.Config{
+		RootCAs: caCertPool,
+	}
+
+	// Create custom HTTP transport
+	transport := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	// Create HTTP client
+	httpClient := &http.Client{
+		Transport: transport,
+	}
+
+	// Initialize OpenAI client with the custom HTTP client
+	client := openai.NewClient(
+		option.WithAPIKey(apiKey),
+		option.WithHTTPClient(httpClient),
+	)
+
+	return client
+}
+
+func TranslateAndUpdateMyanmarReviewsV2(app *types.App) {
 	// Get TranslateMessages
 	// If query length = 0, then do nothing.
 	assistantMessage, userMessage, err := getTranslateMessage(app)
@@ -184,9 +218,10 @@ func TranslateAndUpdateMyanmarReviews(app *types.App) {
 	log.Println("userMessageString: ", string(userMessageString))
 
 	// Initialize OpenAI Client
-	client := openai.NewClient(
-		option.WithAPIKey(app.ENV.OpenAI),
-	)
+	// client := openai.NewClient(
+	// 	option.WithAPIKey(app.ENV.OpenAI),
+	// )
+	client := GetOpenAIClient(app.ENV.OpenAI)
 
 	// Send request to OpenAI
 	chatCompletion, err := client.Chat.Completions.New(app.Context, openai.ChatCompletionNewParams{
@@ -261,7 +296,7 @@ func InitializeOpenAiTranslateScheduler(app *types.App) {
 		),
 		gocron.NewTask(
 			func() {
-				translateAndUpdateMyanmarReviewsV2(app)
+				TranslateAndUpdateMyanmarReviews(app)
 			},
 		),
 	)
