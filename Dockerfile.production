@@ -3,7 +3,11 @@
 # Build stage
 FROM golang:1.23 AS builder
 
-RUN apt-get update && apt-get install -y curl
+# rm -rf /var/lib/apt/lists/* removes cached package lists, which are no longer needed after installation. This reduces the final image size.
+RUN apt-get update && apt-get install -y \
+	curl \
+	ca-certificates && \
+	rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app

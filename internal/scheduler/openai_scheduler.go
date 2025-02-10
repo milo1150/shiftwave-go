@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"strconv"
 	"time"
 
@@ -80,10 +79,8 @@ func GetOpenAIClient(apiKey string) *openai.Client {
 	}
 
 	// Create custom HTTP transport
-	proxyURL, _ := url.Parse("https://shiftwave-dev-b.mijio.app")
 	transport := &http.Transport{
 		TLSClientConfig: tlsConfig,
-		Proxy:           http.ProxyURL(proxyURL),
 	}
 
 	// Create HTTP client
@@ -333,7 +330,7 @@ func InitializeOpenAiTranslateScheduler(app *types.App) {
 		),
 		gocron.NewTask(
 			func() {
-				TranslateAndUpdateMyanmarReviewsV2(app)
+				TranslateAndUpdateMyanmarReviews(app)
 			},
 		),
 	)
