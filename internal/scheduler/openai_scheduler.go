@@ -299,7 +299,7 @@ func InitializeOpenAiTranslateScheduler(app *types.App) {
 		),
 		gocron.NewTask(
 			func() {
-				TranslateAndUpdateMyanmarReviews(app)
+				TranslateAndUpdateMyanmarReviewsV2(app)
 			},
 		),
 	)
