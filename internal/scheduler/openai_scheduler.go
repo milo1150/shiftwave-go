@@ -103,8 +103,7 @@ func translateAndUpdateMyanmarReviews(app *types.App) {
 
 		// Create a custom TLS configuration
 		tlsConfig := &tls.Config{
-			RootCAs:            caCertPool,
-			InsecureSkipVerify: true,
+			RootCAs: caCertPool,
 		}
 
 		// Use the custom TLS config in your HTTP client
