@@ -100,6 +100,38 @@ func GetOpenAIClient(apiKey string) *openai.Client {
 	return client
 }
 
+func GetOpenAIClientV2(authToken string) *openaiV2.Client {
+	// Load system certificates
+	caCertPool, err := x509.SystemCertPool()
+	if err != nil || caCertPool == nil {
+		caCertPool = x509.NewCertPool()
+	}
+
+	// Create custom TLS configuration
+	tlsConfig := &tls.Config{
+		RootCAs:            caCertPool,
+		InsecureSkipVerify: false, // Enable certificate verification
+	}
+
+	// Create custom HTTP transport
+	transport := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
+
+	// Create HTTP client
+	httpClient := &http.Client{
+		Transport: transport,
+	}
+
+	defaultConfig := openaiV2.DefaultConfig(authToken)
+	defaultConfig.HTTPClient = httpClient
+
+	// Initialize OpenAI client with the custom HTTP client
+	client := openaiV2.NewClientWithConfig(defaultConfig)
+
+	return client
+}
+
 func TranslateAndUpdateMyanmarReviewsV2(app *types.App) {
 	// Get TranslateMessages
 	// If query length = 0, then do nothing.
@@ -300,7 +332,7 @@ func InitializeOpenAiTranslateScheduler(app *types.App) {
 		),
 		gocron.NewTask(
 			func() {
-				TranslateAndUpdateMyanmarReviews(app)
+				TranslateAndUpdateMyanmarReviewsV2(app)
 			},
 		),
 	)
