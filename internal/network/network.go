@@ -15,14 +15,14 @@ func LoadCertificate() tls.Certificate {
 		log.Printf("Failed to load .env: %v", err)
 	}
 
-	certFile := os.Getenv("CERT_FILE_PATH")
-	keyFile := os.Getenv("CERT_KEY_PATH")
+	certFilePath := os.Getenv("CERT_FILE_PATH")
+	keyFilePath := os.Getenv("CERT_KEY_PATH")
 
 	// TODO: delete log
-	log.Printf("certFile certificate: %v", err)
-	log.Printf("keyFile certificate: %v", err)
+	log.Println("certFilePath path:", certFilePath)
+	log.Println("keyFilePath path:", keyFilePath)
 
-	cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+	cert, err := tls.LoadX509KeyPair(certFilePath, keyFilePath)
 	if err != nil {
 		log.Printf("Error load certificate: %v", err)
 	}
