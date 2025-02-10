@@ -103,14 +103,14 @@ func GetOpenAIClient(apiKey string) *openai.Client {
 func GetOpenAIClientV2(authToken string) *openaiV2.Client {
 	// Load system certificates
 	caCertPool, err := x509.SystemCertPool()
-	if err != nil || caCertPool == nil {
+	if err != nil {
+		log.Printf("Failed to load system certificates: %v", err)
 		caCertPool = x509.NewCertPool()
 	}
 
 	// Create custom TLS configuration
 	tlsConfig := &tls.Config{
-		RootCAs:            caCertPool,
-		InsecureSkipVerify: false, // Enable certificate verification
+		RootCAs: caCertPool, // Use system CA pool for certificate validation
 	}
 
 	// Create custom HTTP transport
