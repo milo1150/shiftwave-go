@@ -158,7 +158,8 @@ func TranslateAndUpdateMyanmarReviewsV2(app *types.App) {
 	log.Println("userMessageString: ", string(userMessageString))
 
 	// Initialize OpenAI Client
-	client := openaiV2.NewClient(app.ENV.OpenAI)
+	// client := openaiV2.NewClient(app.ENV.OpenAI)
+	client := GetOpenAIClientV2(app.ENV.OpenAI)
 
 	// Define the expected result structure
 	type Result struct {
