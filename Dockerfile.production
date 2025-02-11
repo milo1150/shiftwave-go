@@ -35,10 +35,11 @@ WORKDIR /app
 
 # Install required packages
 # rm -rf /var/lib/apt/lists/* removes cached package lists, which are no longer needed after installation. This reduces the final image size.
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
 	curl \
-	ca-certificates && \
-	rm -rf /var/lib/apt/lists/*
+	ca-certificates \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/*
 
 # Copy the binary from the builder stage
 COPY --from=builder /app/main .
